@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Title, description and social-share tags are generated from src/content/site.json at build time. -->
+<title>Ashish Kumar, HMI Designer</title>
+<link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg">
+<script>try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}
+try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("js")}catch(e){}</script>
+</head>
+<body class="home">
+<div id="curtain"></div>
+<header class="topbar">
+  <a id="email" class="email" href="#"></a>
+  <p id="roleLine" class="role"><span class="arrow">↳</span><span id="roleText"></span></p>
+  <div class="topright"><time id="clock" class="clock"></time></div>
+</header>
+
+<section class="hero" id="hero">
+  <h1 class="bigname" id="bigname"><span id="nameWrap"><span id="nameFirst"></span> <span id="nameLast"></span></span></h1>
+</section>
+
+<main>
+  <section class="strip" id="heroImages"></section>
+
+  <section class="intro">
+    <h2 id="introHeading"></h2>
+    <p id="introText"></p>
+  </section>
+
+  <section class="works" id="works">
+    <div class="sec-head"><h2 id="worksHeading"></h2><p id="worksYears"></p></div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="exp">
+    <h2>Experiences</h2>
+    <div class="exp-cols" id="exp"></div>
+  </section>
+</main>
+
+<footer class="foot" id="foot"></footer>
+
+<noscript><p style="padding:24px;font:14px monospace">This portfolio needs JavaScript. Contact: see the links on the site.</p></noscript>
+<script type="module" src="/src/js/main.js"></script>
+</body>
+</html>
