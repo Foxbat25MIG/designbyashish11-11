@@ -17,6 +17,11 @@ const observer =
       )
     : null;
 
+/** Project-page videos and the PAX image keep their full frame: the box takes the file's own aspect ratio. */
+function fitBox(box, w, h) {
+  if (w && h && box.closest(".shot, .pax-v")) box.style.aspectRatio = w + " / " + h;
+}
+
 export function mediaBox(src, type, alt) {
   const box = document.createElement("div");
   box.className = "media";
@@ -41,6 +46,8 @@ export function mediaBox(src, type, alt) {
       v.remove();
       missing();
     });
+    // On project pages, size the box to the video's own shape so nothing is cropped
+    v.addEventListener("loadedmetadata", () => fitBox(box, v.videoWidth, v.videoHeight));
     v.src = url(src);
     box.appendChild(v);
     if (observer) observer.observe(v);
@@ -54,6 +61,7 @@ export function mediaBox(src, type, alt) {
       i.remove();
       missing();
     });
+    i.addEventListener("load", () => fitBox(box, i.naturalWidth, i.naturalHeight));
     i.src = url(src);
     box.appendChild(i);
   }
