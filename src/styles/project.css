@@ -42,6 +42,20 @@
 
 
 /* project pages: images/videos expand once from the corner, then stay full size */
-html.js body.project [data-img]{clip-path:inset(0 78% 70% 0)}
+html.js body.project [data-img]{clip-path:inset(0 100% 100% 0)}
+body.project .foot{position:relative}
+
+/* project pages: text entrances, same as the home page */
+html.js body.project .p-title h1:not(.is-ready):not(.is-done),
+html.js body.project .about h2:not(.is-ready):not(.is-done),
+html.js body.project .pax h2:not(.is-ready):not(.is-done),
+html.js body.project .shot h3:not(.is-ready):not(.is-done),
+html.js body.project .p-over small:not(.is-ready):not(.is-done),
+html.js body.project .back-next a:not(.is-ready):not(.is-done),
+html.js body.project .contact > span:not(.is-ready):not(.is-done){visibility:hidden}
+html.js body.project .p-over > :not(small),html.js body.project .about .body,html.js body.project .pax > p,html.js body.project .contact time{opacity:0;transition:opacity .9s ease .35s}
+html.js body.project .p-over > .is-in,html.js body.project .about .body.is-in,html.js body.project .pax > p.is-in,html.js body.project .contact time.is-in{opacity:1}
+html.js body.project .contact .pills a{opacity:0;transform:translateY(10px);transition:opacity .8s ease,transform .9s var(--ease-out),background .2s,color .2s}
+html.js body.project .contact .pills a.is-in{opacity:1;transform:none}
 body.project .shot,body.project .p-top,body.project .pax-v{position:relative}
 body.project .dim{position:absolute;z-index:3;font:400 11px/1 var(--mono);letter-spacing:.02em;color:var(--muted);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .25s}

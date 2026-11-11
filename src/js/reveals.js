@@ -1,7 +1,9 @@
 /* Entrance animations.
    headings : a solid block grows in line by line, then wipes away and the text is revealed
    labels   : typed out with scrambled letters and a block cursor
-   images   : expand from the top-left corner as you scroll, with a live X / Y readout
+   images   : stay hidden until they scroll into view, then expand from the top-left corner with a live X / Y readout
+              and a crosshair riding the growing corner, which locks on when the image is fully open
+   The same reveals run on the home page and on every project page.
    They are switched off automatically for visitors who prefer reduced motion (no "js" class on <html>). */
 import { $, $$, clamp, esc } from "./utils.js";
 import { fitName } from "./fitName.js";
@@ -96,6 +98,14 @@ function typeIn(el, delay) {
   }, delay * 1000);
 }
 
+/** The corner crosshair snaps shut and fades once an image has fully opened ("target acquired"). */
+export function lockOn(xh) {
+  if (!xh) return;
+  xh.classList.remove("lock");
+  void xh.offsetWidth;
+  xh.classList.add("lock");
+}
+
 export function initReveals() {
   const root = document.documentElement;
   if (!root.classList.contains("js") || !("IntersectionObserver" in window)) return;
@@ -113,11 +123,22 @@ export function initReveals() {
     },
     { rootMargin: "0px 0px -8% 0px", threshold: 0 }
   );
-  // Text reveals only run on the home page (project pages only use the image expand below).
+  // the footer sits at the very bottom of the page, so it is watched without the bottom margin
+  const ioFoot = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        ioFoot.unobserve(e.target);
+        const job = jobs.get(e.target);
+        if (job) job();
+      });
+    },
+    { threshold: 0 }
+  );
   const queue = (el, fn) => {
-    if (!el || !isHome) return;
+    if (!el) return;
     jobs.set(el, fn);
-    io.observe(el);
+    (el.closest(".foot") ? ioFoot : io).observe(el);
   };
 
   /* hero */
@@ -137,6 +158,15 @@ export function initReveals() {
   $$(".exp-cols > div").forEach((col, ci) => {
     Array.prototype.forEach.call(col.children, (c, k) => queue(c, () => typeIn(c, 0.3 + ci * 0.18 + k * 0.12)));
   });
+  /* project pages: same language as the home page (block wipe on headings, typed labels, fading paragraphs) */
+  if (!isHome) {
+    queue($(".p-title h1"), () => blockReveal($(".p-title h1"), 0.15));
+    queue($(".p-over small"), () => typeIn($(".p-over small"), 0.3));
+    $$(".p-over > :not(small)").forEach((p) => queue(p, () => p.classList.add("is-in")));
+    $$(".about h2, .pax h2, .shot h3").forEach((h) => queue(h, () => blockReveal(h, 0)));
+    $$(".about .body, .pax > p").forEach((b) => queue(b, () => b.classList.add("is-in")));
+    $$(".back-next a").forEach((a, i) => queue(a, () => typeIn(a, 0.1 + i * 0.15)));
+  }
   /* footer */
   queue($(".contact > span"), () => typeIn($(".contact > span"), 0.1));
   $$(".contact .pills a").forEach((a, i) =>
@@ -147,19 +177,20 @@ export function initReveals() {
   );
   queue($(".contact time"), () => $(".contact time").classList.add("is-in"));
 
-  /* images: scroll-scrubbed expansion from the top-left corner */
+  /* images: hidden until they enter the view, then a scroll-scrubbed expansion from the top-left corner */
   const imgs = $$("[data-img]").map((el) => {
     const host = el.parentElement;
     const mk = (c) => {
       const s = document.createElement("span");
-      s.className = "dim " + c;
+      s.className = c;
       s.setAttribute("aria-hidden", "true");
       host.appendChild(s);
       return s;
     };
-    return { el, x: mk("dim-x"), y: mk("dim-y"), done: false };
+    return { el, x: mk("dim dim-x"), y: mk("dim dim-y"), xh: mk("xh"), done: false, t: 0 };
   });
   const ease = (t) => t * t * (3 - 2 * t);
+  let pending = false;
   function scrub() {
     const vh = innerHeight;
     const maxScroll = Math.max(0, root.scrollHeight - vh);
@@ -167,22 +198,38 @@ export function initReveals() {
       if (o.done) return;
       const r = o.el.getBoundingClientRect();
       const w = o.el.offsetWidth, h = o.el.offsetHeight;
-      const startTop = vh * 0.99;
-      const endTop = Math.max(vh * 0.58, r.top + scrollY - maxScroll + 18);
-      const t = clamp((startTop - r.top) / Math.max(1, startTop - endTop), 0, 1);
+      const startTop = vh * 0.96;
+      const endTop = Math.max(vh * 0.5, r.top + scrollY - maxScroll + 18);
+      // images already in view on arrival open by themselves (after the preloader) instead of sitting half open
+      if (o.auto === undefined) o.auto = r.top + scrollY < vh * 0.8 ? performance.now() + 1300 : 0;
+      const t = o.auto
+        ? clamp((performance.now() - o.auto) / 1100, 0, 1)
+        : clamp((startTop - r.top) / Math.max(1, startTop - endTop), 0, 1);
+      if (o.auto && t < 1 && !pending) {
+        pending = true;
+        requestAnimationFrame(() => { pending = false; scrub(); });
+      }
       const e = ease(t);
-      const pw = 0.22 + 0.78 * e, ph = 0.3 + 0.7 * e;
+      const pw = e, ph = e;
+      if (t >= 1 && o.t < 1) lockOn(o.xh);
+      o.t = t;
       if (t >= 1 && !isHome) o.done = true;
       o.el.style.clipPath = t >= 1 ? "none" : "inset(0 " + ((1 - pw) * 100).toFixed(2) + "% " + ((1 - ph) * 100).toFixed(2) + "% 0)";
       const show = t > 0.02 && t < 0.995;
       o.x.style.opacity = o.y.style.opacity = show ? 1 : 0;
+      o.xh.classList.toggle("on", show);
       if (show) {
+        const cx = o.el.offsetLeft + w * pw, cy = o.el.offsetTop + h * ph;
         o.x.textContent = "X: " + Math.round(w * pw);
         o.y.textContent = "Y: " + Math.round(h * ph);
-        o.x.style.left = o.el.offsetLeft + w * pw + 8 + "px";
-        o.x.style.top = o.el.offsetTop + h * ph - 14 + "px";
+        o.x.style.left = cx + 14 + "px";
+        o.x.style.top = cy - 16 + "px";
         o.y.style.left = o.el.offsetLeft + 4 + "px";
-        o.y.style.top = o.el.offsetTop + h * ph + 6 + "px";
+        o.y.style.top = cy + 8 + "px";
+      }
+      if (show || t >= 1) {
+        o.xh.style.left = o.el.offsetLeft + w * pw + "px";
+        o.xh.style.top = o.el.offsetTop + h * ph + "px";
       }
     });
   }

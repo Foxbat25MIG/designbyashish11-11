@@ -3,17 +3,27 @@ import { $, esc, inline, url } from "../utils.js";
 import { mediaBox, placeMedia } from "../media.js";
 import { renderFooter } from "../chrome.js";
 import { fitName } from "../fitName.js";
-import { initReveals } from "../reveals.js";
+import { initReveals, lockOn } from "../reveals.js";
 
-/** Hero tiles grow from small to full size as you scroll, with a live X / Y readout. */
+/** Hero tiles stay hidden until you scroll, then grow to full size with a live X / Y readout and a corner crosshair. */
 function growStrip(cells) {
   function update() {
     const vh = innerHeight;
     cells.forEach((o) => {
       const r = o.cell.getBoundingClientRect();
-      const p = Math.min(1, Math.max(0, (vh * 1.02 - r.top) / (vh * 0.7)));
-      const k = 0.08 + 0.92 * p;
+      // start once the page has moved, so nothing shows as a tiny thumbnail on arrival
+      const start = Math.min(vh * 0.9, r.top + scrollY - 2);
+      const p = Math.min(1, Math.max(0, (start - r.top) / (vh * 0.62)));
+      const k = p * p * (3 - 2 * p);
       const w = o.cell.clientWidth * k, h = o.cell.clientHeight * k;
+      const show = k > 0.01 && k < 0.995;
+      o.m.style.visibility = k > 0.001 ? "visible" : "hidden";
+      o.rx.style.opacity = o.ry.style.opacity = show ? 1 : 0;
+      o.xh.classList.toggle("on", show);
+      o.xh.style.left = w + "px";
+      o.xh.style.top = h + "px";
+      if (k >= 0.995 && o.k < 0.995) lockOn(o.xh);
+      o.k = k;
       o.m.style.width = w + "px";
       o.m.style.height = h + "px";
       o.rx.textContent = "X: " + Math.round(w);
@@ -48,9 +58,12 @@ export function renderHome(site, data) {
     const rx = document.createElement("span");
     const ry = document.createElement("span");
     rx.className = ry.className = "rd";
-    cell.append(m, rx, ry);
+    const xh = document.createElement("span");
+    xh.className = "xh";
+    xh.setAttribute("aria-hidden", "true");
+    cell.append(m, rx, ry, xh);
     strip.appendChild(cell);
-    cells.push({ cell, m, rx, ry });
+    cells.push({ cell, m, rx, ry, xh, k: 0 });
   });
   growStrip(cells);
 

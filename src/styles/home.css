@@ -45,7 +45,9 @@ body.home{
 .home .foot .art>img{object-fit:contain}
 .home .contact{font-size:var(--small);column-gap:var(--gap);padding-top:1vw}
 .home .contact>span{text-transform:uppercase}
-.home .contact .pills{justify-self:start;gap:.5em}
+/* centred under the artwork, between its two vertical lines (the art's centre sits ~0.4vw right of the page centre) */
+.home .contact .pills{justify-self:center;gap:.35em;position:relative;left:.4vw}
+.home .contact .pills a{padding-left:.6em;padding-right:.6em}
 .home .pill{font-size:calc(var(--small)*.85);border-radius:.4em;padding:.45em .9em}
 
 @media (max-width:760px){
@@ -84,7 +86,7 @@ html.js body.home .contact > span:not(.is-ready):not(.is-done){visibility:hidden
 .cur{display:inline-block;width:.55em;height:.85em;margin-left:1px;background:currentColor;vertical-align:-.08em}
 
 /* images: clipped from the corner, scrubbed by scroll */
-html.js body.home [data-img]{clip-path:inset(0 78% 70% 0)}
+html.js body.home [data-img]{clip-path:inset(0 100% 100% 0)}
 .home .strip,.home .card,.home .foot{position:relative}
 .dim{position:absolute;z-index:3;font:400 calc(var(--small)*.62)/1 var(--font);letter-spacing:.02em;color:var(--muted);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .25s}
 
@@ -100,4 +102,5 @@ html.js body.home .contact .pills a.is-in{opacity:1;transform:none}
 /* image strip: tiles grow with the scroll and show their size */
 .home .strip .cell{position:relative;aspect-ratio:16/10}
 .home .strip .cell .media{position:absolute;left:0;top:0;aspect-ratio:auto}
-.rd{position:absolute;font-size:calc(var(--small)*.62);color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums;pointer-events:none}
+.rd{position:absolute;transition:opacity .25s;font-size:calc(var(--small)*.62);color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums;pointer-events:none}
+@media (max-width:760px){.home .contact .pills{justify-self:start;left:0}}
