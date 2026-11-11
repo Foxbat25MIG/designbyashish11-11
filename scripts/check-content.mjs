@@ -64,6 +64,7 @@ if (data) {
     checkFile(p.logo, label + " logo");
     (p.top_images || []).forEach((m) => checkFile(m, label + " top_images"));
     checkFile(p.intro_video, label + " intro_video");
+    checkFile(p.intro_image, label + " intro_image");
     (p.media || []).forEach((m) => checkFile(m.src, label + " media"));
   });
 }

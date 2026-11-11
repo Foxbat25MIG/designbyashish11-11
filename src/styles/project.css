@@ -22,6 +22,7 @@
 .shot h3{font-weight:400;font-size:clamp(18px,1.8vw,26px);letter-spacing:-.01em;margin:0 0 14px}
 .pax-v{width:min(100%,1120px);margin:28px auto 0;text-align:left}
 .pax-v .media{aspect-ratio:16/9}
+.pax .ln{margin-left:auto;margin-right:auto}  /* centred headings stay centred while they wipe in */
 .nf{min-height:100svh;display:grid;place-content:center;gap:16px;text-align:center}.nf h1{font-size:72px;font-weight:500}
 
 

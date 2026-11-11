@@ -31,7 +31,7 @@ export function renderProject(site, data) {
   document.title = p.title + " - Projects";
   $("#crumb").textContent = p.title;
 
-  const hasIntro = p.intro_title || p.intro_text || p.intro_video;
+  const hasIntro = p.intro_title || p.intro_text || p.intro_video || p.intro_image;
   page.innerHTML =
     '<section class="p-head"><div class="p-title"><div id="logo"></div><h1>' + esc(p.title) + "</h1></div>" +
     (p.overview ? '<div class="p-over"><small>Overview</small>' + md(p.overview) + "</div>" : "") + "</section>" +
@@ -55,6 +55,7 @@ export function renderProject(site, data) {
 
   const paxV = $(".pax-v");
   if (p.intro_video) placeMedia(paxV, p.intro_video, "video", p.intro_title);
+  else if (p.intro_image) placeMedia(paxV, p.intro_image, "image", p.intro_title);
   else if (paxV) paxV.remove();
 
   (p.media || []).forEach((m) => {

@@ -15,6 +15,7 @@
       "about_text": "The objective of this UI Project was to create a durable, context-aware interface that empowers drivers during extreme off-road conditions while remaining intuitive for everyday stationary use. The visual language is defined by a light UI base optimized for high-visibility outdoor and night use, supported by strong iconography and minimal color usage. Key design elements include:\n\n- **Adaptive Context:** A UI that shifts based on driving conditions to provide the most relevant data.\n- **Visual Precision:** High-contrast typography and red accents to highlight active states and critical alerts.\n- **Experiential Integration:** The use of photographic elements to create an immersive feel for various experiential driving modes.",
       "intro_title": "Meet PAX",
       "intro_text": "Hello, I am PAX, your AI assistant. Providing clear guidance, timely information, and seamless control so you can stay focused on the road.\n\nJust ask, and I'll adapt to help you drive safely, comfortably, and confidently.",
+      "intro_image": "/media/mahindra/pax-image.jpg",
       "media": [
         {
           "type": "video",
@@ -80,6 +81,11 @@
       "media": [
         {
           "type": "video",
+          "src": "/media/hud/satellite-tracking-dashboard.mp4",
+          "caption": "Satellite Tracking Dashboard"
+        },
+        {
+          "type": "video",
           "src": "/media/hud/reconnaissance-drone.mp4",
           "caption": "Reconnaissance Drone"
         },
@@ -119,8 +125,8 @@
       "logo": "/media/honda/logo.png",
       "overview": "Design a race-focused digital instrument cluster UI for Honda Racing, created specifically for the Honda CBR1000RR. The UI translates final sketches, layouts, and motion references into a high-performance, production-ready concept optimised for track riding.",
       "top_images": [
-        "/media/honda/image-1.jpg",
-        "/media/honda/image-2.jpg"
+        "/media/honda/image-1.png",
+        "/media/honda/image-2.png"
       ],
       "about_text": "Create a clear, fast, and distraction-free UI that delivers critical performance data at a glance while reinforcing Honda Racing’s values of precision, control, and engineering excellence.\n\n**Visual Language**\n\n- Function-first\n- No decorative elements\n- Strong visual hierarchy\n- Modular and grid-based layout states",
       "intro_title": "",
@@ -237,6 +243,11 @@
       "intro_title": "",
       "intro_text": "",
       "media": [
+        {
+          "type": "video",
+          "src": "/media/instrument/cluster-video.mp4",
+          "caption": "Instrument Cluster"
+        },
         {
           "type": "video",
           "src": "/media/instrument/panoramic-screen.mp4",
