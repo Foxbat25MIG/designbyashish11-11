@@ -29,7 +29,8 @@ try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches)document.document
   --f-data:'Jost',system-ui,sans-serif;
   --wc:255,255,255; color-scheme:dark;
 }
-:root[data-theme="light"]{
+/* dashboard light mode: set by the dashboard's own toggle (data-hmi) or by the page's theme button */
+.wrap.dash[data-hmi="light"],html[data-theme="light"] .lib{
   --ground:#e6ecf3; --deck:#f2f5f9; --glass:rgba(255,255,255,.82); --glass-hi:rgba(255,255,255,.96);
   --line:rgba(30,52,84,.14); --line-hi:rgba(30,52,84,.3);
   --ink:#0e1a2b; --ink-dim:#3f5068; --ink-faint:#55677f;
@@ -112,6 +113,11 @@ body{font-variant-numeric:tabular-nums}
 .speedctl small{font-size:12px;color:var(--ink-faint)}
 .view{padding:12px}
 .view[hidden]{display:none}
+.deck [hidden]{display:none!important}
+/* the dashboard has its own theme, so its text colour is resolved on the dashboard itself */
+.wrap.dash,.lib{color:var(--ink)}
+/* the dial-click switch sits on the page, outside the deck, so it uses the page colours */
+.wrap.dash>.dash-tools{--ink:var(--p-fg);--ink-dim:var(--p-muted);--ink-faint:var(--p-muted);--line:var(--p-line);--line-hi:var(--p-line);color:var(--p-fg)}
 .grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px}
 .s12{grid-column:span 12}.s8{grid-column:span 8}.s7{grid-column:span 7}.s5{grid-column:span 5}.s4{grid-column:span 4}
 @media(max-width:1000px){.s8,.s7,.s5,.s4{grid-column:span 12}}
@@ -519,9 +525,9 @@ html.pf .pf-sec .src{gap:6px;margin:0 0 1.4em;padding:0;list-style:none}
 html.pf .pf-sec .src a{color:var(--p-fg);text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--p-line)}
 html.pf .pf-sec .src a:hover{opacity:.6}
 /* dashboard intro, centred like "Meet PAX" */
-.pax{text-align:center;padding:0 var(--pad) 40px;font-size:12px}
+.pax{text-align:left;padding:0 var(--pad) 40px;font-size:12px}
 html.pf .pax h2{font-family:var(--font);font-weight:400;font-size:clamp(24px,2.4vw,34px);margin-bottom:18px;letter-spacing:-.01em;line-height:1.35}
-.pax p{margin:0 auto 12px;max-width:40em}
+.pax p{margin:0 0 12px;max-width:40em}
 html.pf .wrap.dash{max-width:none;margin:0;padding:0 var(--pad) 28px}
 .dash-tools{justify-content:flex-end;margin-bottom:12px}
 /* footer */
@@ -593,7 +599,7 @@ html:not(.js) #curtain{display:none}
       <button role="tab" data-v="div" id="tab-div" aria-controls="view-div">Diversion</button>
     </div>
     <div class="status">
-      <span class="stat"><small>Time (UTC)</small><b id="clock">10:20:00</b></span>
+      <span class="stat"><small>Time (UTC)</small><b id="hmi-clock">10:20:00</b></span>
       <span class="stat"><small>Phase</small><b class="ui" id="phase-name">Cruise</b></span>
       <span class="stat"><small>Sector</small><b class="ui">CDG to DEL</b></span>
     </div>
@@ -1189,7 +1195,17 @@ function ffOf(n){
   for(let i=1;i<FFT.length;i++){if(n<=FFT[i][0]){const a=FFT[i-1],b=FFT[i];return lerp(a[1],b[1],(n-a[0])/(b[0]-a[0]));}}
   return FFT[FFT.length-1][1];
 }
-const freshState=()=>({p:0,alt:0,spd:0,hdg:98,selAlt:0,selSpd:0,selHdg:98,parked:true,gone:false,sel:'norm',eng:[{st:'off',master:false,t:0},{st:'off',master:false,t:0}],n2:[0,0],egt:[15,15],ap:true,athr:true,spdMan:false,mach:false,vmode:'alt',selVs:1000,altStep:100,vs:0,pitch:0,roll:0,n1:[0,0],t:START_T,speed:1,
+/* flight-plan fuel: block fuel at the gate, minus the planned burn of every phase (two engines at the phase thrust) */
+const BLOCK_FUEL=62000,FINAL_RES=3500;
+const PLAN=(()=>{const pts=[[0,BLOCK_FUEL]];let f=BLOCK_FUEL;PHASES.forEach(ph=>{f-=2*ffOf(ph.n1)*ph.w*LEG_H;pts.push([ph.e,f]);});return pts;})();
+function planFuel(p){p=clamp(p,0,1);for(let i=1;i<PLAN.length;i++){if(p<=PLAN[i][0]){const a=PLAN[i-1],b=PLAN[i];return lerp(a[1],b[1],(p-a[0])/Math.max(1e-9,b[0]-a[0]));}}return PLAN[PLAN.length-1][1];}
+/* load fuel the way the tanks are used: wings full first, the rest in the centre tank (burnt first) */
+function setFuel(tot){const w=Math.min(20000,tot/2);S.fuel.L=w;S.fuel.R=w;S.fuel.C=Math.max(0,tot-2*w);}
+const fuelTot=()=>S.fuel.L+S.fuel.R+S.fuel.C;
+/* route track (true course) at a point of the flight, used by NAV mode */
+function trackAt(p){const q=clamp(p,0,.997),a=llOf(q),b=llOf(q+.002),dl=b.lo-a.lo;return wrap360(Math.atan2(Math.sin(dl)*Math.cos(b.la),Math.cos(a.la)*Math.sin(b.la)-Math.sin(a.la)*Math.cos(b.la)*Math.cos(dl))*180/Math.PI);}
+const ALT_FLOOR={climb:2000,cruise:2000,desc:2000,appr:1000};
+const freshState=()=>({nav:true,phI:0,engOut:false,p:0,alt:0,spd:0,hdg:98,selAlt:0,selSpd:0,selHdg:98,parked:true,gone:false,sel:'norm',eng:[{st:'off',master:false,t:0},{st:'off',master:false,t:0}],n2:[0,0],egt:[15,15],ap:true,athr:true,spdMan:false,mach:false,vmode:'alt',selVs:1000,altStep:100,vs:0,pitch:0,roll:0,n1:[0,0],t:START_T,speed:1,
   fuel:{L:20000,R:20000,C:22000},fault:false,xfeed:false,ffs:[0,0]});
 let S=freshState();
 
@@ -1215,26 +1231,40 @@ function engModel(i,dt){
   return true;
 }
 function step(dt){
-  const k=Math.min(S.speed,6),sd=dt*S.speed;
+  /* climb, turn and speed rates run on simulation time, so at 10x and 60x the aircraft keeps up with the flight plan */
+  const k=Math.min(S.speed,120),sd=dt*S.speed;
   S.t+=sd;
   if(S.gone&&S.p<1)S.p=Math.min(1,S.p+sd/(LEG_H*3600));
-  const ph=PHASES[phaseAt(S.p)];
+  const pi=phaseAt(S.p),ph=PHASES[pi];
+  /* entering a new phase: the flight plan sets new targets, as a managed FMS would (the crew can still override them with the dials) */
+  if(S.gone&&pi!==S.phI){
+    S.phI=pi;S.nav=true;S.vmode='alt';
+    if(pi>=phIdx('tkof')){S.selAlt=S.engOut?Math.min(ph.selAlt,26000):ph.selAlt;S.selSpd=S.engOut?Math.min(ph.selSpd,260):ph.selSpd;}
+    if(window.syncAP)syncAP();
+  }
   if(S.spdMan){S.selSpd=ph.selSpd;if(window.dials&&dials.spd)dials.spd.render();}
-  const dAlt=S.selAlt-S.alt;
+  if(S.nav&&S.ap)S.selHdg=Math.round(trackAt(S.p));
+  /* on the ground the dials only preset targets; the aircraft stays on the runway until it rotates */
+  const gnd=!S.gone||S.p>=1||ph.id==='start'||ph.id==='taxi'||(ph.id==='tkof'&&S.alt<1&&S.spd<150);
+  const floor=ph.id==='tkof'?(S.alt>50?1000:0):(ALT_FLOOR[ph.id]||0);
+  const altT=gnd?0:Math.max(S.selAlt,floor),spdT=gnd&&ph.id!=='tkof'?(S.gone&&ph.id==='taxi'?14:0):S.selSpd;
+  S.gnd=gnd;
+  const dAlt=altT-S.alt;
   let vsT=clamp(dAlt*1.6,-2400,2400);
   if(S.vmode==='vs'&&Math.abs(dAlt)>250&&Math.sign(dAlt)===Math.sign(S.selVs))vsT=S.selVs;
   if(!S.ap)vsT=0;
-  S.vs=lerp(S.vs,vsT,clamp(dt*1.5,0,1));
+  S.vs=lerp(S.vs,vsT,clamp(dt*1.5*Math.max(1,k/4),0,1));
   S.alt=clamp(S.alt+S.vs/60*dt*k,0,41000);
-  if(Math.abs(S.selAlt-S.alt)<8&&Math.abs(S.vs)<40){S.alt=S.selAlt;S.vs=0;}
-  if(S.athr)S.spd+=clamp(S.selSpd-S.spd,-3*dt*k,3*dt*k);
+  if(Math.abs(altT-S.alt)<8&&Math.abs(S.vs)<40){S.alt=altT;S.vs=0;}
+  if(S.athr||gnd)S.spd+=clamp(spdT-S.spd,-3*dt*k,3*dt*k);
   const dH=S.ap?((S.selHdg-S.hdg+540)%360)-180:0;
   S.hdg=wrap360(S.hdg+clamp(dH,-3*dt*k,3*dt*k));
   S.roll=lerp(S.roll,clamp(dH*.6,-25,25),clamp(dt*1.2,0,1));
-  S.pitch=lerp(S.pitch,2.2+clamp(S.vs/2400*6,-6,6),clamp(dt*1.5,0,1));
-  if(S.p>=1&&!S.parked){S.parked=true;S.gone=false;S.selAlt=0;S.selSpd=0;S.ap=true;S.athr=true;S.spdMan=false;S.sel='norm';S.eng.forEach(e=>{e.st='off';e.master=false;});if(window.syncAP)syncAP();}
-  const n1T=S.p>=1?0:ph.n1;
+  S.pitch=lerp(S.pitch,gnd||S.alt<1?0:2.2+clamp(S.vs/2400*6,-6,6),clamp(dt*1.5,0,1));
+  if(S.p>=1&&!S.parked){S.parked=true;S.alt=0;S.vs=0;S.gone=false;S.selAlt=0;S.selSpd=0;S.ap=true;S.athr=true;S.spdMan=false;S.sel='norm';S.eng.forEach(e=>{e.st='off';e.master=false;});if(window.syncAP)syncAP();}
+  const out=S.engOut&&S.gone&&S.p<1,n1T=S.p>=1?0:out?Math.min(97,ph.n1+8):ph.n1;
   for(let i=0;i<2;i++){
+    if(out&&i===1){S.n1[1]=lerp(S.n1[1],4,clamp(dt*.6,0,1));S.n2[1]=lerp(S.n2[1],11,clamp(dt*.6,0,1));S.egt[1]=lerp(S.egt[1],40,clamp(dt*.4,0,1));S.ffs[1]=0;continue;}
     if(!engModel(i,dt)){
       S.n1[i]=lerp(S.n1[i],n1T+(n1T?Math.sin(S.t/50+i*2)*.25:0),clamp(dt*.8,0,1));
       S.n2[i]=lerp(S.n2[i],IDLE_N2+(S.n1[i]-21)*.58,clamp(dt*1.2,0,1));
@@ -1250,6 +1280,9 @@ function step(dt){
   });
   if(S.fault&&!S.xfeed)f.R=Math.max(0,f.R-6000*sd/3600);
   if(S.xfeed){const m=clamp((f.L-f.R)/2,-6000*sd/3600,6000*sd/3600);f.L-=m;f.R+=m;}
+  /* demo safeguard: in the air fuel never drops below the final reserve; it is restored to the flight plan instead */
+  if(S.gone&&S.p<1&&fuelTot()<FINAL_RES){S.fault=false;setFuel(Math.max(planFuel(S.p),FINAL_RES+3000));
+    raise({id:'fuel-demo',tier:'memo',title:'FUEL RESTORED TO PLAN',src:'Simulation',action:'Demo only: fuel was reset to the flight-plan value so the flight can continue.'});}
   watch(ph);
 }
 function watch(ph){
@@ -1270,7 +1303,7 @@ dials.spd=makeDial($('#dial-spd'),{label:'Selected speed',
   get:()=>S.mach?+selMach().toFixed(2):S.selSpd,
   set:v=>{if(S.spdMan){S.spdMan=false;if(window.syncAP)syncAP();}S.selSpd=S.mach?Math.round(casFromMach(v,S.alt)):v;},
   fmt:v=>S.mach?'M'+(+v).toFixed(2).slice(1):String(Math.round(v))});
-dials.hdg=makeDial($('#dial-hdg'),{label:'Selected heading in degrees',min:0,max:359,step:1,perRev:360,wrap:true,get:()=>S.selHdg,set:v=>{S.selHdg=v;},fmt:v=>String(Math.round(v)).padStart(3,'0')});
+dials.hdg=makeDial($('#dial-hdg'),{label:'Selected heading in degrees',min:0,max:359,step:1,perRev:360,wrap:true,get:()=>S.selHdg,set:v=>{S.nav=false;S.selHdg=v;},fmt:v=>String(Math.round(v)).padStart(3,'0')});
 dials.alt=makeDial($('#dial-alt'),{label:'Selected altitude in feet',min:0,max:41000,get step(){return S.altStep},perRev:10000,get:()=>S.selAlt,set:v=>{S.selAlt=v;},fmt:v=>fmt(v)});
 const refreshDials=()=>Object.values(dials).forEach(d=>d.render());
 
@@ -1310,9 +1343,12 @@ function buildRibbon(){
 function jumpTo(i){
   const ph=PHASES[i];
   if(ph.id==='start'){const sp=S.speed;S=freshState();S.speed=sp;alerts.clear();refreshDials();if(window.syncAP)syncAP();renderAlerts();say('Phase: Start. Engines are off.');return;}
-  S.p=ph.s+.0005;S.alt=ph.alt;S.spd=ph.spd;S.selAlt=ph.selAlt;S.selSpd=ph.selSpd;S.vs=0;S.gone=true;S.parked=false;S.sel='norm';
+  S.p=ph.s+.0005;S.alt=ph.alt;S.spd=ph.spd;S.selAlt=S.engOut?Math.min(ph.selAlt,26000):ph.selAlt;S.selSpd=S.engOut?Math.min(ph.selSpd,260):ph.selSpd;S.vs=0;S.gone=true;S.parked=false;S.sel='norm';
+  S.phI=i;S.nav=true;S.vmode='alt';S.hdg=S.selHdg=Math.round(trackAt(S.p));S.roll=0;S.pitch=ph.alt?2.2:0;
   S.eng.forEach(e=>{e.st='idle';e.master=true;});S.n1=[ph.n1,ph.n1];S.n2=S.n1.map(n=>IDLE_N2+(n-21)*.58);S.egt=S.n1.map(n=>250+n*5.4);
-  refreshDials();say(`Phase: ${ph.name}.`);
+  /* refuel to the flight plan for this point of the flight, so the demo can be replayed in any order */
+  S.fault=false;setFuel(planFuel(S.p));clearAlert('fuel-demo');clearAlert('fuel-imb');
+  if(window.syncAP)syncAP();else refreshDials();say(`Phase: ${ph.name}. Fuel set to the flight plan, ${fmt(Math.round(fuelTot()/100)*100)} kg.`);
 }
 function resetSim(){
   const sp=S.speed;S=freshState();S.speed=sp;alerts.clear();C.door=false;C.locked=false;applyX(false);refreshDials();if(window.syncAP)syncAP();
@@ -1324,7 +1360,7 @@ $('#reset').addEventListener('click',resetSim);
 const arcs=[makeArc($('#arc1'),{unit:'N1 %',caut:.9,warn:.96}),makeArc($('#arc2'),{unit:'N1 %',caut:.9,warn:.96})];
 function updateUI(){
   const ph=PHASES[phaseAt(S.p)];
-  $('#clock').textContent=timeStr(S.t,true);$('#phase-name').textContent=S.p>=1?'On blocks':ph.name;
+  $('#hmi-clock').textContent=timeStr(S.t,true);$('#phase-name').textContent=S.p>=1?'On blocks':ph.name;
   $$('#ribbon .ph').forEach((b,i)=>{
     const p=PHASES[i];b.style.setProperty('--f',clamp((S.p-p.s)/(p.e-p.s),0,1));
     if(i===phaseAt(S.p))b.setAttribute('aria-current','step');else b.removeAttribute('aria-current');
@@ -1345,12 +1381,13 @@ function updateUI(){
   $('#route-pct').textContent=Math.round(S.p*100)+'% flown';
   $('#rt-nm').textContent=fmt(Math.round((1-S.p)*LEG_NM))+' nm';
   $('#rt-eta').textContent=timeStr(S.t+left*3600);
-  $('#rt-fuel').textContent=fmt(Math.max(0,Math.round((tot-left*7000)/100)*100))+' kg';
+  $('#rt-fuel').textContent=fmt(Math.max(0,Math.round((tot-(planFuel(S.p)-planFuel(1))*(S.engOut?.85:1))/100)*100))+' kg';
   const A=atm(S.alt,S.spd),gs=groundSpeed(A.tas,S.hdg);
   $('#s-mach').textContent=A.mach.toFixed(3);$('#s-tas').textContent=Math.round(A.tas)+' kt';$('#s-gs').textContent=Math.round(Math.max(0,gs))+' kt';
   $('#s-wind').textContent=WIND.from+'/'+WIND.kt;$('#s-sat').textContent=Math.round(A.sat)+' °C';
   $('#s-cabin').textContent=fmt(Math.round(clamp(S.alt*.3,400,6000)/100)*100)+' ft';
   if(window.doorUI)window.doorUI();
+  refreshDials();
 }
 let srT=0;
 function updateSR(){
@@ -1390,7 +1427,7 @@ function drawPFD(){
   /* flight mode annunciator */
   const dAlt=S.selAlt-S.alt,dH=((S.selHdg-S.hdg+540)%360)-180;
   const vsAct=S.vmode==='vs'&&Math.abs(dAlt)>250&&Math.sign(dAlt)===Math.sign(S.selVs);
-  const modes=[!S.athr?'A/THR OFF':S.spdMan?'SPD MANAGED':Math.abs(S.selSpd-S.spd)<2?'SPD HOLD':'SPD SEL',!S.ap?'AP OFF':Math.abs(dH)<1?'HDG HOLD':'HDG SEL',!S.ap?'MANUAL':vsAct?'V/S '+(S.selVs>0?'+':'')+S.selVs:Math.abs(dAlt)<60?'ALT HOLD':dAlt>0?'ALT CLB':'ALT DES'];
+  const modes=[!S.athr?'A/THR OFF':S.spdMan?'SPD MANAGED':Math.abs(S.selSpd-S.spd)<2?'SPD HOLD':'SPD SEL',!S.ap?'AP OFF':S.nav?'NAV':Math.abs(dH)<1?'HDG HOLD':'HDG SEL',!S.ap?'MANUAL':vsAct?'V/S '+(S.selVs>0?'+':'')+S.selVs:Math.abs(dAlt)<60?'ALT HOLD':dAlt>0?'ALT CLB':'ALT DES'];
   const fcol=[S.athr?COL.green:COL.amber,S.ap?COL.green:COL.amber,S.ap?COL.green:COL.amber];
   for(let i=0;i<3;i++){const x=cx-225+i*150;c.fillStyle=COL.panel;c.fillRect(x,12,150,34);c.strokeStyle=COL.edge;c.lineWidth=1;c.strokeRect(x+.5,12.5,149,33);T(modes[i],x+75,29,`600 17px ${FU}`,fcol[i],'center');}
   /* master alert chips */
@@ -1456,13 +1493,14 @@ function drawPFD(){
   let last=performance.now(),uiT=0;
   function frame(now){
     const dt=Math.min(.1,(now-last)/1000);last=now;
-    step(dt);
-    if(!$('#view-flight').hidden)drawPFD();
-    if(window.glFrame)window.glFrame();
-    uiT+=dt;srT+=dt;
-    if(uiT>.12){uiT=0;updateUI();}
-    if(srT>6){srT=0;updateSR();}
     requestAnimationFrame(frame);
+    const run=(n,fn)=>{try{fn();}catch(e){if(!run[n]){run[n]=1;console.error('HMI '+n,e);}}};
+    run('sim',()=>step(dt));
+    if(!$('#view-flight').hidden)run('pfd',drawPFD);
+    if(window.glFrame)run('views',window.glFrame);
+    uiT+=dt;srT+=dt;
+    if(uiT>.12){uiT=0;run('ui',updateUI);}
+    if(srT>6){srT=0;run('sr',updateSR);}
   }
   window.startSim=()=>requestAnimationFrame(frame);
 })();
@@ -2155,6 +2193,12 @@ function m2init(){
   ['pointerup','pointercancel'].forEach(ev=>cv.addEventListener(ev,()=>{drag=null;}));
   cv.setAttribute('data-lenis-prevent','');cv.addEventListener('wheel',e=>{if(RV.view!=='sat')return;e.preventDefault();M2.zoom=Math.max(.6,Math.min(2.6,M2.zoom*(1-Math.sign(e.deltaY)*.08)));},{passive:false});
 }
+function segTo(c,v,mode,R,a,b,col,wd,dash){const p=pj(a.la,a.lo,v,mode,R),q=pj(b.la,b.lo,v,mode,R);if(!p[2]||!q[2])return;c.beginPath();c.moveTo(p[0],p[1]);c.lineTo(q[0],q[1]);c.strokeStyle=col;c.lineWidth=wd;c.setLineDash(dash||[]);c.stroke();c.setLineDash([]);}
+function groundTag(c,w){
+  const onG=S.p>=1||!S.gone||S.gnd,code=S.p>.5?RT.B.n:RT.A.n,txt=onG?'ON GROUND · '+code:'AIRBORNE · FL'+String(Math.round(S.alt/100)).padStart(3,'0');
+  c.font='600 12px Jost,sans-serif';const tw=c.measureText(txt).width+18;c.fillStyle='rgba(5,10,17,.78)';c.fillRect(12,12,tw,24);
+  c.strokeStyle=onG?'#4be38f':'#3ad4ec';c.lineWidth=1;c.strokeRect(12.5,12.5,tw-1,23);c.fillStyle=onG?'#4be38f':'#3ad4ec';c.textAlign='left';c.fillText(txt,21,28);
+}
 function drawGlobe(c,w,h,ac,nx){
   const R=.4*Math.min(w,h)*M2.zoom,cx=w/2,cy=h/2,la0=Math.max(-1.45,Math.min(1.45,ac.la+M2.dla)),lo0=ac.lo+M2.dlo,v=vw(la0,lo0);
   c.fillStyle='#02050a';c.fillRect(0,0,w,h);
@@ -2165,7 +2209,7 @@ function drawGlobe(c,w,h,ac,nx){
   graticule(c,v,'o',R,30,30,'rgba(255,255,255,.1)');
   landPaths(c,v,'o',R,p=>landColor(p.ml),'rgba(215,235,245,.45)');
   strokeRoute(c,v,'o',R,0,96,'#e676f0',2,[5,5]);
-  const k=Math.floor(S.p*96);strokeRoute(c,v,'o',R,0,k,'#f2f6fa',2.6);
+  const k=Math.floor(S.p*96);strokeRoute(c,v,'o',R,0,k,'rgba(2,6,12,.7)',5);strokeRoute(c,v,'o',R,0,k,'#f2f6fa',2.6);segTo(c,v,'o',R,RLL[k],ac,'rgba(2,6,12,.7)',5);segTo(c,v,'o',R,RLL[k],ac,'#f2f6fa',2.6);
   /* day and night */
   const sunLo=(12-(S.t/3600)%24)*15*D2R,sl=-15.5*D2R,sv=[Math.cos(sl)*Math.cos(sunLo),Math.sin(sl),-Math.cos(sl)*Math.sin(sunLo)];
   const zc=[v.cLa*v.cLo,v.sLa,-v.cLa*v.sLo],ea=[-v.sLo,0,-v.cLo],no=[-v.sLa*v.cLo,v.cLa,v.sLa*v.sLo];
@@ -2184,6 +2228,7 @@ function drawGlobe(c,w,h,ac,nx){
   if(qa[2]){const ang=Math.atan2(qn[0]-qa[0],-(qn[1]-qa[1]));c.strokeStyle='rgba(58,212,236,.9)';c.lineWidth=1.5;c.beginPath();c.arc(qa[0],qa[1],13,0,7);c.stroke();planeSym(c,qa[0],qa[1],ang,.95,'#3ad4ec','#06202a');}
   c.restore();
   c.strokeStyle='rgba(180,215,235,.25)';c.lineWidth=1;c.beginPath();c.arc(cx,cy,R,0,7);c.stroke();
+  groundTag(c,w);
 }
 function drawMap(c,w,h,ac,nx){
   const mid=llOf(.5),v=vw(mid.la,mid.lo),S2=w/2/.9,cx=w/2,cy=h/2+4;
@@ -2194,7 +2239,7 @@ function drawMap(c,w,h,ac,nx){
   graticule(c,v,'a',S2,15,15,'rgba(130,170,210,.13)');
   landPaths(c,v,'a',S2,()=>'#142332','rgba(96,140,178,.55)');
   const k=Math.floor(S.p*96);
-  strokeRoute(c,v,'a',S2,k,96,'#e676f0',2,[7,5]);strokeRoute(c,v,'a',S2,0,k,'#f2f6fa',3);
+  strokeRoute(c,v,'a',S2,k,96,'#e676f0',2,[7,5]);strokeRoute(c,v,'a',S2,0,k,'#f2f6fa',3);segTo(c,v,'a',S2,RLL[k],ac,'#f2f6fa',3);
   for(let nm=500;nm<LEG_NM;nm+=500){const f=nm/LEG_NM,q=pj(llOf(f).la,llOf(f).lo,v,'a',S2);c.fillStyle=f<S.p?'#f2f6fa':'#e676f0';c.beginPath();c.arc(q[0],q[1],2.6,0,7);c.fill();}
   c.restore();
   c.font='500 11px Jost,sans-serif';c.textAlign='center';c.fillStyle='#93a3b8';
@@ -2209,12 +2254,13 @@ function drawMap(c,w,h,ac,nx){
   c.strokeStyle='#93a3b8';c.lineWidth=1;c.beginPath();c.arc(nx0,ny0,15,0,7);c.stroke();
   c.strokeStyle='#f2f6fa';c.lineWidth=2.2;c.beginPath();c.moveTo(nx0-nax*7,ny0-nay*7);c.lineTo(nx0+nax*11,ny0+nay*11);c.stroke();c.fillStyle='#f2f6fa';c.textAlign='center';c.font='600 11px Jost,sans-serif';c.fillText('N',nx0+nax*22,ny0+nay*22+4);
   c.textAlign='left';c.font='500 12px Jost,sans-serif';c.fillStyle='#93a3b8';c.fillText('Great circle, '+fmt(Math.round(LEG_NM))+' nm',14,h-14);
+  groundTag(c,w);
 }
 function render2D(){
   m2init();const cv=M2.cv,dpr=Math.min(devicePixelRatio||1,2),w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return;
   if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);}
   M2.w=w;M2.h=h;const c=M2.c;c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,w,h);
-  const ac=llOf(Math.min(S.p,.995)),nx=llOf(Math.min(S.p+.004,1));
+  const ac=llOf(Math.min(S.p,1)),nx=llOf(Math.min(S.p+.004,1));
   if(RV.view==='sat')drawGlobe(c,w,h,ac,nx);else drawMap(c,w,h,ac,nx);
 }
 
@@ -2226,11 +2272,14 @@ function earthTexture(){
   const X=lo=>(lo+180)/360*2048,Y=la=>(90-la)/180*1024;
   const oc=g.createLinearGradient(0,0,0,1024);oc.addColorStop(0,'#0a2238');oc.addColorStop(.5,'#0d3c60');oc.addColorStop(1,'#0a2238');
   g.fillStyle=oc;g.fillRect(0,0,2048,1024);g.lineJoin='round';
+  /* land coloured by latitude (ice, forest, desert, tropics) so large continents are not one flat colour */
+  const LANDG=g.createLinearGradient(0,0,0,1024);
+  [[90,'#dfe9ee'],[72,'#c9d8de'],[64,'#5f7d5a'],[48,'#4c7449'],[38,'#7f7f55'],[28,'#a08f63'],[18,'#8d8a5c'],[8,'#3f7446'],[-8,'#3f7446'],[-22,'#94875e'],[-40,'#58784f'],[-60,'#c9d8de'],[-90,'#dfe9ee']].forEach(a=>LANDG.addColorStop((90-a[0])/180,a[1]));
   LAND.forEach(poly=>{
     let s=0,n=0;for(let k=1;k<poly[0].length;k+=2){s+=Math.abs(poly[0][k]);n++;}
     g.beginPath();
     poly.forEach(ring=>{for(let k=0;k<ring.length;k+=2){const x=X(ring[k]),y=Y(ring[k+1]);if(k)g.lineTo(x,y);else g.moveTo(x,y);}g.closePath();});
-    g.fillStyle=landColor(s/Math.max(1,n));g.fill('evenodd');g.strokeStyle='rgba(205,230,240,.5)';g.lineWidth=1.1;g.stroke();
+    g.fillStyle=LANDG;g.fill('evenodd');g.strokeStyle='rgba(205,230,240,.35)';g.lineWidth=1.1;g.stroke();
   });
   TEX=new THREE.CanvasTexture(cv);TEX.anisotropy=4;return TEX;
 }
@@ -2291,39 +2340,119 @@ function renderDeck(){
   d.open=doorEase()*2.0944;d.ac.door.rotation.x=d.open;
   const cp=Math.cos(DKS.pitch);
   d.cam.position.set(-2+DKS.d*cp*Math.cos(DKS.yaw),-.5+DKS.d*Math.sin(DKS.pitch),DKS.d*cp*Math.sin(DKS.yaw));
-  d.cam.lookAt(-2,-.5,0);d.ac.tick();d.r.render(d.sc,d.cam);
+  d.cam.lookAt(-2,-.5,0);gearAnim(d);d.ac.tick();d.r.render(d.sc,d.cam);
 }
 
 /* ---------- outside view ---------- */
 let RG=null;
 const RV={view:'arrow'};
-const RS={out:{yaw:Math.PI+.7,pitch:.28,d:105}};
-function resetRouteCam(){Object.assign(RS.out,{yaw:Math.PI+.7,pitch:.28,d:105});M2.dlo=0;M2.dla=0;M2.zoom=1;}
+const RS={out:{yaw:Math.PI+.7,pitch:.35,d:170}};
+function resetRouteCam(){Object.assign(RS.out,{yaw:Math.PI+.7,pitch:.35,d:170});M2.dlo=0;M2.dla=0;M2.zoom=1;}
+/* airport surface laid along the route at departure or arrival: grass, runway with markings, parallel taxiway, apron with the airport code */
+function airportTex(code,icao,name){
+  const W=256,H=2048,cv=document.createElement('canvas');cv.width=W;cv.height=H;const c=cv.getContext('2d');
+  c.fillStyle='#3d4a35';c.fillRect(0,0,W,H);
+  for(let i=0;i<500;i++){c.fillStyle=`rgba(${60+Math.random()*30|0},${78+Math.random()*30|0},${52+Math.random()*20|0},.5)`;c.fillRect(Math.random()*W,Math.random()*H,6,14);}
+  const rw0=W*.5-34,rw1=W*.5+34;c.fillStyle='#34383d';c.fillRect(rw0,0,rw1-rw0,H);
+  c.fillStyle='#e9edf2';c.fillRect(rw0+3,0,3,H);c.fillRect(rw1-6,0,3,H);
+  for(let y=150;y<H-150;y+=70)c.fillRect(W/2-2,y,4,38);
+  [0,H-110].forEach(y0=>{for(let k=0;k<8;k++)c.fillRect(rw0+10+k*7,y0+14,4,80);for(let k=0;k<8;k++)c.fillRect(W/2+5+k*7,y0+14,4,80);});
+  c.fillRect(rw0+12,330,14,90);c.fillRect(rw1-26,330,14,90);c.fillRect(rw0+12,H-420,14,90);c.fillRect(rw1-26,H-420,14,90);
+  const tx=W*.5+68;c.fillStyle='#2e3237';c.fillRect(tx-14,0,28,H);c.fillStyle='#f2c230';c.fillRect(tx-1.5,0,3,H);
+  for(let y=260;y<H;y+=420){c.fillStyle='#2e3237';c.fillRect(rw1,y,tx-rw1,22);c.fillStyle='#f2c230';c.fillRect(rw1,y+10,tx-rw1,2.5);}
+  c.fillStyle='#2b2f34';c.fillRect(tx+14,H*.3,W-tx-14,H*.4);
+  c.save();c.translate(W*.9,H*.5);c.rotate(Math.PI/2);c.fillStyle='#f2f6fa';c.textAlign='center';c.textBaseline='middle';
+  c.font='700 46px Jost,sans-serif';c.fillText(code,0,-4);c.font='600 18px Jost,sans-serif';c.fillText(icao+'  '+name,0,30);c.restore();
+  c.save();c.translate(W*.15,H*.5);c.rotate(-Math.PI/2);c.fillStyle='rgba(242,246,250,.85)';c.textAlign='center';c.font='700 34px Jost,sans-serif';c.fillText(code,0,0);c.restore();
+  const t=new THREE.CanvasTexture(cv);t.anisotropy=8;return t;
+}
+function gcE(f){if(f>=0&&f<=1)return gc(f);const e=f<0?0:1,a=gc(e),b=gc(e?1-.001:.001),k=Math.abs(e-f)/.001,v=[a[0]+(a[0]-b[0])*k,a[1]+(a[1]-b[1])*k,a[2]+(a[2]-b[2])*k],l=Math.hypot(v[0],v[1],v[2]);return [v[0]/l,v[1]/l,v[2]/l];}
+function grassPad(R0,f0,f1){
+  const n=50,W=1500,pos=[],uv=[],idx=[];
+  for(let j=0;j<=n;j++){const f=f0+(f1-f0)*j/n,c=V(gcE(f),1).normalize(),t=V(gcE(f+.001),1).sub(V(gcE(f-.001),1)).normalize(),sd=new THREE.Vector3().crossVectors(t,c).normalize();
+    [-1,-.5,0,.5,1].forEach((k,m)=>{const p=c.clone().multiplyScalar(R0+.5-Math.abs(k)*.4).addScaledVector(sd,k*W/2);pos.push(p.x,p.y,p.z);uv.push(m/4,j/n);});
+    if(j<n)for(let m=0;m<4;m++){const a=j*5+m;idx.push(a,a+5,a+1,a+1,a+5,a+6);}}
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();
+  const cv=document.createElement('canvas');cv.width=256;cv.height=1024;const c=cv.getContext('2d');c.fillStyle='#4a5a3e';c.fillRect(0,0,256,1024);
+  for(let i=0;i<900;i++){c.fillStyle=`rgba(${50+Math.random()*40|0},${70+Math.random()*40|0},${40+Math.random()*25|0},.55)`;c.fillRect(Math.random()*256,Math.random()*1024,4+Math.random()*10,8+Math.random()*30);}
+  const gr=c.createLinearGradient(0,0,256,0);gr.addColorStop(0,'rgba(74,90,62,1)');gr.addColorStop(.12,'rgba(74,90,62,0)');gr.addColorStop(.88,'rgba(74,90,62,0)');gr.addColorStop(1,'rgba(74,90,62,1)');
+  const tex=new THREE.CanvasTexture(cv);
+  return new THREE.Mesh(g,new THREE.MeshStandardMaterial({map:tex,emissive:0xffffff,emissiveMap:tex,emissiveIntensity:.12,color:0xb4b4b4,roughness:1,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1}));
+}
+function airportPad(R0,f0,f1,code,icao,name){
+  const n=60,W=170,pos=[],uv=[],idx=[];
+  for(let j=0;j<=n;j++){
+    const f=f0+(f1-f0)*j/n,c=V(gcE(f),1).normalize(),t=V(gcE(f+.001),1).sub(V(gcE(f-.001),1)).normalize(),sd=new THREE.Vector3().crossVectors(t,c).normalize();
+    [-1,1].forEach((k,m)=>{const p=c.clone().multiplyScalar(R0+.8).addScaledVector(sd,k*W/2);pos.push(p.x,p.y,p.z);uv.push(m,j/n);});
+    if(j<n){const a=j*2;idx.push(a,a+2,a+1,a+1,a+2,a+3);}
+  }
+  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(idx);g.computeVertexNormals();
+  const tex=airportTex(code,icao,name);
+  return new THREE.Mesh(g,new THREE.MeshStandardMaterial({map:tex,emissive:0xffffff,emissiveMap:tex,emissiveIntensity:.32,roughness:1,side:THREE.DoubleSide,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
+}
+function gearClear(ac){ac.setGear(0);ac.group.updateMatrixWorld(true);const b=new THREE.Box3().setFromObject(ac.group);return Math.max(1,-b.min.y);}
 function routeNote(t){const n=$('#gl-note');n.hidden=false;n.textContent=t;}
 function ensureRoute(){
   if(RG||RG===false)return;
   try{
     const canvas=$('#rt-gl'),r=new THREE.WebGLRenderer({canvas,antialias:true});r.setPixelRatio(Math.min(devicePixelRatio||1,2));
     const out=new THREE.Scene();out.background=new THREE.Color(0x030811);out.environment=makeEnv(r);
-    const planet=new THREE.Mesh(new THREE.SphereGeometry(12000,128,96),new THREE.MeshStandardMaterial({map:earthTexture(),roughness:1}));out.add(planet);
+    const planet=new THREE.Mesh(new THREE.SphereGeometry(12000,128,96),new THREE.MeshStandardMaterial({map:earthTexture(),roughness:1,color:0x8f969c}));out.add(planet);
     const glow=new THREE.Mesh(new THREE.SphereGeometry(12380,96,64),new THREE.MeshBasicMaterial({color:0x58b4ff,transparent:true,opacity:.22,side:THREE.BackSide,blending:THREE.AdditiveBlending,depthWrite:false}));out.add(glow);
     const sun2=new THREE.DirectionalLight(0xffffff,1.1);out.add(sun2);out.add(new THREE.AmbientLight(0x9db0cf,.35));out.add(new THREE.HemisphereLight(0xcfe3ff,0x3a4452,.45));
     const ac=aircraftModel(false);out.add(ac.group);
-    RG={r,out,sun2,planet,glow,ac,cam:new THREE.PerspectiveCamera(40,1.33,1,60000),w:0,h:0};
-    orbit(canvas,()=>[RS.out,{minP:-.3,maxP:1.4,minD:60,maxD:600}]);
+    /* the route drawn on the ground: flown part white, the rest magenta, plus a drop line from the aircraft to its track */
+    const R0=12000,rp=[];for(let i=0;i<=600;i++)rp.push(V(gc(i/600),R0+1.6));
+    /* thin dashed route on the ground */
+    const path=new THREE.Line(new THREE.BufferGeometry().setFromPoints(rp),new THREE.LineDashedMaterial({color:0xf2f6fa,dashSize:9,gapSize:7,transparent:true,opacity:.85}));
+    path.computeLineDistances();planet.add(path);
+    /* small waypoint marker: a diamond on the next waypoint */
+    const wc=document.createElement('canvas');wc.width=wc.height=64;const wx=wc.getContext('2d');wx.strokeStyle='#ffd23a';wx.lineWidth=5;wx.beginPath();wx.moveTo(32,6);wx.lineTo(58,32);wx.lineTo(32,58);wx.lineTo(6,32);wx.closePath();wx.stroke();wx.fillStyle='#ffd23a';wx.beginPath();wx.arc(32,32,6,0,7);wx.fill();
+    const wpt=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(wc),sizeAttenuation:false,depthTest:false,transparent:true}));wpt.scale.set(.035,.035,1);planet.add(wpt);
+    const WF=[];{let a=0;WF.push(0);WA.forEach(w=>{a+=w;WF.push(a/LEG_TOT);});}
+    /* faint HUD: a heading ring round the aircraft with tick marks, and a small ring on its ground point */
+    const hud=new THREE.Group(),hm=new THREE.LineBasicMaterial({color:0xdfe8f0,transparent:true,opacity:.32,depthWrite:false});
+    const ring=(r,n)=>{const pts=[];for(let i=0;i<=n;i++){const a=i/n*Math.PI*2;pts.push(new THREE.Vector3(Math.cos(a)*r,0,Math.sin(a)*r));}return new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),hm);};
+    out.add(hud);
+    const gring=new THREE.Group();
+    const flown=path,ahead=path,SEG=0,RAD=0;
+    /* country borders (Natural Earth 1:50m via world-atlas), drawn as thin lines on the ground */
+    fetch('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json').then(r=>r.json()).then(tp=>{
+      const sc=tp.transform.scale,tr=tp.transform.translate,pts=[];
+      tp.arcs.forEach(a=>{let x=0,y=0,prev=null;a.forEach(d=>{x+=d[0];y+=d[1];const lo=x*sc[0]+tr[0],la=y*sc[1]+tr[1];
+        const v=vec(la,lo),p=[v[0]*(R0+.6),v[1]*(R0+.6),v[2]*(R0+.6)];if(prev&&Math.abs(lo-prev[3])<90)pts.push(prev[0],prev[1],prev[2],p[0],p[1],p[2]);prev=[p[0],p[1],p[2],lo];});});
+      const bg=new THREE.BufferGeometry();bg.setAttribute('position',new THREE.Float32BufferAttribute(pts,3));
+      planet.add(new THREE.LineSegments(bg,new THREE.LineBasicMaterial({color:0xeef4f8,transparent:true,opacity:.45,depthWrite:false})));
+    }).catch(()=>{});
+    planet.add(grassPad(R0,-.03,.07));planet.add(grassPad(R0,.93,1.03));
+    planet.add(airportPad(R0,-.004,.03,'CDG','LFPG','Paris Charles de Gaulle'));planet.add(airportPad(R0,.972,1.004,'DEL','VIDP','Delhi Indira Gandhi'));
+    const dropG=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),new THREE.Vector3(0,-100,0)]);
+    const drop=new THREE.Line(dropG,new THREE.LineBasicMaterial({color:0xe676f0,transparent:true,opacity:.9}));drop.visible=false;
+    RG={r,out,sun2,planet,glow,ac,flown,ahead,SEG,RAD,drop,wpt,WF,hud,gring,R0,gc:gearClear(ac),cam:new THREE.PerspectiveCamera(40,1.33,8,60000),w:0,h:0};
+    orbit(canvas,()=>[RS.out,{minP:.05,maxP:1.45,minD:24,maxD:420}]);
   }catch(e){RG=false;routeNote('The outside view needs WebGL, which is unavailable in this browser.');}
 }
 function renderRoute(){
   const g=RG;if(!g)return;sizeTo(g,g.cam);
-  const p0=Math.min(S.p,.997),sunV=V(vec(-15.5,(12-(S.t/3600)%24)*15),1);
+  const p0=clamp(S.p,.0015,.997),sunV=V(vec(-15.5,(12-(S.t/3600)%24)*15),1);
   const n=V(gc(p0),1).normalize(),t=V(gc(p0+.002),1).sub(V(gc(p0),1)).normalize(),Yax=new THREE.Vector3(0,1,0);
   const st=RS.out,q1=new THREE.Quaternion().setFromUnitVectors(n,Yax),t1=t.clone().applyQuaternion(q1);
   const q=new THREE.Quaternion().setFromAxisAngle(Yax,Math.atan2(t1.z,t1.x)).multiply(q1);
-  g.planet.quaternion.copy(q);g.planet.position.set(0,-12700,0);g.glow.position.copy(g.planet.position);
+  /* height above the ground follows the real altitude (compressed), so on the ground the wheels sit on the runway */
+  const H=g.gc+.8+88*Math.sqrt(clamp(S.alt,0,41000)/41000),ty=-(H-g.gc)/2*clamp((st.d-60)/110,0,1);
+  g.planet.quaternion.copy(q);g.planet.position.set(0,-(g.R0+H),0);g.glow.position.copy(g.planet.position);
+  /* the dashed route flies at the aircraft's height, just under its belly; the vertical line drops from it to the ground */
+  const rr=g.R0+H-g.gc-1.2;g.flown.scale.setScalar(rr/(g.R0+1.6));
+  const wi=g.WF.findIndex(x=>x>p0+.002);g.wpt.visible=wi>0;if(wi>0)g.wpt.position.copy(V(gc(g.WF[wi]),rr));
+  g.hud.position.y=0;g.gring.position.y=-H+1.8;
+  const dp=g.drop.geometry.attributes.position;dp.setY(0,-g.gc-1.2);dp.setY(1,-H+1.6);dp.needsUpdate=true;g.drop.visible=false;
   g.sun2.position.copy(sunV.applyQuaternion(q).multiplyScalar(3000));
-  g.ac.group.quaternion.setFromEuler(new THREE.Euler(S.roll*D2R,0,S.pitch*.6*D2R,'XYZ'));gearAnim(g);
-  const cp=Math.cos(st.pitch);g.cam.position.set(st.d*cp*Math.cos(st.yaw),st.d*Math.sin(st.pitch),st.d*cp*Math.sin(st.yaw));
-  g.cam.lookAt(0,0,0);g.ac.tick();g.r.render(g.out,g.cam);
+  /* nose follows the route; in heading select it points off the route by the heading difference */
+  const yaw=S.nav?0:-clamp(((S.hdg-trackAt(S.p)+540)%360)-180,-60,60)*D2R;
+  g.ac.group.quaternion.setFromEuler(new THREE.Euler(S.roll*D2R,yaw,S.pitch*.6*D2R,'YZX'));gearAnim(g);
+  /* the camera aims between the aircraft and the ground below it, so the route line under the aircraft stays in view */
+  const cp=Math.cos(st.pitch);g.cam.position.set(st.d*cp*Math.cos(st.yaw),ty+st.d*Math.sin(st.pitch),st.d*cp*Math.sin(st.yaw));
+  g.cam.lookAt(0,ty,0);g.ac.tick();g.r.render(g.out,g.cam);
 }
 /* gear: down on the ground, retracts after lift-off, extends below 2,500 ft on the way down */
 function gearDown(){const id=PHASES[phaseAt(S.p)].id;return S.parked||id==='start'||id==='taxi'||id==='appr'||id==='land'||(id==='tkof'&&S.alt<120)||(id==='desc'&&S.alt<2500);}
@@ -2360,10 +2489,12 @@ $('#st-next').addEventListener('click',()=>stepStation(1));
 /* ---------- theme and dial sound ---------- */
 (function(){
   const rdv=k=>{try{return localStorage.getItem(k);}catch(e){return null;}},wrv=(k,v)=>{try{localStorage.setItem(k,v);}catch(e){}};
-  const setTheme=l=>{document.documentElement.dataset.theme=l?'light':'dark';};
-  const tt=bindToggle($('#tog-theme'),on=>{setTheme(on);wrv('a350f-theme',on?'light':'dark');say(on?'Light mode.':'Dark mode.');});
+  /* this toggle themes the dashboard only; the theme button in the page header themes the page and the dashboard */
+  const dash=$('.wrap.dash'),setTheme=l=>{if(dash)dash.dataset.hmi=l?'light':'dark';};
+  const tt=bindToggle($('#tog-theme'),on=>{setTheme(on);wrv('a350f-theme',on?'light':'dark');say(on?'Dashboard light mode.':'Dashboard dark mode.');});
+  window.setDashTheme=l=>{setTheme(l);tt(l);wrv('a350f-theme',l?'light':'dark');};
   const ts=bindToggle($('#tog-sound'),on=>{SND.on=on;wrv('a350f-snd',on?'1':'0');if(on)clickSound();say(on?'Dial click on.':'Dial click off.');},['Off','On']);
-  if(rdv('a350f-theme')==='light'){setTheme(true);tt(true);}
+  const dt=rdv('a350f-theme')||rdv('theme');if(dt==='light'){setTheme(true);tt(true);}else setTheme(false);
   if(rdv('a350f-snd')==='0'){SND.on=false;ts(false);}
 })();
 
@@ -2727,7 +2858,16 @@ renderAlerts();updateUI();updateSR();doorUI();window.startSim();
   }
   const mk=makeSeg;
   const sr=mk($('#dv-range'),'aria-pressed',v=>{D.range=+v;});sr.set(1);
-  const se=mk($('#dv-eng'),'aria-pressed',v=>{D.eng=+v;$('#dv-badge').textContent=v==='1'?'One engine out':'Both engines';});se.set(0);
+  const se=mk($('#dv-eng'),'aria-pressed',v=>setEngOut(v==='1'));se.set(0);
+  function setEngOut(on){
+    S.engOut=on;D.eng=on?1:2;$('#dv-badge').textContent=on?'One engine out':'Both engines';
+    if(on){
+      raise({id:'eng2-out',tier:'caut',title:'ENG 2 SHUT DOWN',src:'Engines',action:'Engine 2 is shut down. Drift down to FL260 at 260 kt and divert to the nearest suitable airport.',
+        steps:['Thrust lever 2: IDLE','Engine 2 master: OFF','Target FL260, speed 260 kt','Select an alternate in the diversion planner']});
+      if(S.gone&&S.p<1){S.selAlt=Math.min(S.selAlt,26000);S.selSpd=Math.min(S.selSpd,260);if(window.syncAP)syncAP();}
+      say('Engine 2 shut down. Drift down to 26,000 feet.');
+    }else{clearAlert('eng2-out');if(S.gone&&S.p<1){const ph=PHASES[phaseAt(S.p)];S.selAlt=ph.selAlt;S.selSpd=ph.selSpd;if(window.syncAP)syncAP();}say('Both engines running.');}
+  }
   function draw(){
     const dpr=Math.min(devicePixelRatio||1,2),w=cv.clientWidth,h=cv.clientHeight;if(!w||!h)return;
     if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);}
@@ -2759,7 +2899,10 @@ renderAlerts();updateUI();updateSR();doorUI();window.startSim();
   }
   list.addEventListener('click',e=>{const b=e.target.closest('.dv-row');if(b){D.sel=D.sel===b.dataset.ic?null:b.dataset.ic;D.sig='';}});
   cv.addEventListener('click',e=>{const r=cv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;let best=null,bd=18;D.hits.forEach(h=>{const d=Math.hypot(h.x-x,h.y-y);if(d<bd){bd=d;best=h.ic;}});D.sel=best;D.sig='';});
-  const prev=window.radarFrame;window.radarFrame=()=>{if(prev)prev();if(!$('#view-div').hidden)draw();};
+  /* keep the engine selector in step with the simulation (Start or Reset brings both engines back) */
+  const prev=window.radarFrame;window.radarFrame=()=>{if(prev)prev();
+    if(!!S.engOut!==(D.eng===1)){D.eng=S.engOut?1:2;se.set(S.engOut?1:0);$('#dv-badge').textContent=S.engOut?'One engine out':'Both engines';if(!S.engOut)clearAlert('eng2-out');}
+    if(!$('#view-div').hidden)draw();};
 })();
 
 /* ---------- livery option for the outside view ---------- */
@@ -2767,7 +2910,7 @@ renderAlerts();updateUI();updateSR();doorUI();window.startSim();
   const b=$('#tog-liv');
   function apply(on){
     b.setAttribute('aria-pressed',String(on));b.querySelector('em').textContent=on?'On':'Off';AC.liv=on?'test':'house';
-    if(typeof RG!=='undefined'&&RG&&RG.ac){RG.out.remove(RG.ac.group);RG.ac=aircraftModel(false);RG.out.add(RG.ac.group);}
+    if(typeof RG!=='undefined'&&RG&&RG.ac){RG.out.remove(RG.ac.group);RG.ac=aircraftModel(false);RG.out.add(RG.ac.group);RG.gc=gearClear(RG.ac);RG.gf=undefined;}
     try{localStorage.setItem('a350f-liv',on?'1':'0');}catch(e){}
   }
   b.addEventListener('click',()=>apply(b.getAttribute('aria-pressed')!=='true'));
@@ -2831,16 +2974,16 @@ renderAlerts();updateUI();updateSR();doorUI();window.startSim();
       f12=new Intl.DateTimeFormat("en-US",{timeZone:"Europe/Rome",hour12:true,hour:"numeric",minute:"2-digit",second:"2-digit"});
   function tick(){var n=new Date();if($("#clock"))$("#clock").textContent=f24.format(n);if($("#clock2"))$("#clock2").textContent=f12.format(n);}
   tick();setInterval(tick,1000);
-  var hmiTog=$("#tog-theme"),isLight=function(){return document.documentElement.dataset.theme==="light"};
-  function setTheme(light){
-    if(hmiTog&&(hmiTog.getAttribute("aria-pressed")==="true")!==light)hmiTog.click();
+  /* header theme button: themes the whole page, dashboard included (the dashboard's own toggle only themes the dashboard) */
+  var isLight=function(){return document.documentElement.dataset.theme==="light"};
+  function setTheme(light,all){
     document.documentElement.dataset.theme=light?"light":"dark";
-    try{localStorage.setItem("theme",light?"light":"dark");localStorage.setItem("a350f-theme",light?"light":"dark");}catch(e){}
+    try{localStorage.setItem("theme",light?"light":"dark");}catch(e){}
+    if(all&&window.setDashTheme)window.setDashTheme(light);
   }
   var saved=null;try{saved=localStorage.getItem("theme");}catch(e){}
-  if(saved)setTheme(saved==="light");
-  if($("#themeBtn"))$("#themeBtn").addEventListener("click",function(){setTheme(!isLight());});
-  if(hmiTog)hmiTog.addEventListener("click",function(){try{localStorage.setItem("theme",isLight()?"light":"dark");}catch(e){}});
+  if(saved)setTheme(saved==="light",false);
+  if($("#themeBtn"))$("#themeBtn").addEventListener("click",function(){setTheme(!isLight(),true);});
   /* preloader */
   var cur=$("#curtain"),jsOn=document.documentElement.classList.contains("js"),HEX="0123456789ABCDEF",NOISE="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+/<>=",
       TITLE="ASHISH KUMAR / HMI DESIGNER";
