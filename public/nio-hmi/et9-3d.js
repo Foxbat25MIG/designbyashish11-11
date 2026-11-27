@@ -22,7 +22,7 @@ export const PAINTS = {
   gold:     { name: 'Sunlight Gold',         c: '#b89c6c', m: .8,  r: .26, e: .75 },
 };
 const storedPaint = () => { try { return localStorage.getItem('nio-paint'); } catch (e) { return null; } };
-let paintKey = PAINTS[storedPaint()] ? storedPaint() : 'ceramic';
+let paintKey = PAINTS[storedPaint()] ? storedPaint() : 'lavender';
 
 /* ---------- shared materials ---------- */
 const M = {
