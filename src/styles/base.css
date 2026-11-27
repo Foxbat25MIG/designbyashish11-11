@@ -90,6 +90,18 @@ main{position:relative}
 .xh i,.xh b{display:none}
 .xh.lock{animation:xh-lock .7s cubic-bezier(.2,.7,.2,1) both}
 @keyframes xh-lock{0%{opacity:1;transform:scale(1) rotate(0)}35%{opacity:1;transform:scale(.55) rotate(45deg)}100%{opacity:0;transform:scale(1.8) rotate(45deg)}}
+/* Footer: the same on every page as on the homepage (wide artwork, then the contact row). */
+.foot{--fpad:4.4vw;--fgap:2vw;--fsmall:clamp(13px,1.25vw,26px);padding:0 var(--fpad) var(--fpad)}
+.foot .art{max-width:none;margin:0;aspect-ratio:16/9;background:none}
+.foot .art img{width:100%;height:100%;display:block;object-fit:contain}
+.foot .art .media{width:100%;height:100%;background:none}
+.foot .contact{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;font-size:var(--fsmall);column-gap:var(--fgap);row-gap:16px;padding-top:1vw}
+.foot .contact>span{text-transform:uppercase}
+.foot .contact .pills{display:flex;justify-self:center;gap:.35em;position:relative;left:.4vw}
+.foot .contact .pill{font-size:calc(var(--fsmall)*.85);border-radius:.4em;padding:.45em .6em}
+.foot .contact time{justify-self:end}
+@media (max-width:760px){.foot .contact{grid-template-columns:1fr}.foot .contact .pills{justify-self:start;left:0}.foot .contact time{justify-self:start}}
+
 @media (prefers-reduced-motion:reduce){.xh{display:none}}
 
 /* decrypt preloader (the #curtain overlay, driven by js/curtain.js) */

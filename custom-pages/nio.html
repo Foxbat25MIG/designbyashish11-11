@@ -85,6 +85,18 @@ a{color:inherit;text-decoration:none}img,video,iframe{display:block;max-width:10
 .card p,.card .b{font-size:14px;line-height:1.5}
 .tour button{font-size:14px}.tour span{font-size:13px}
 .note{font-size:13px;line-height:1.5}
+
+/* Footer: the same on every page as on the homepage (wide artwork, then the contact row). */
+.foot{--fpad:4.4vw;--fgap:2vw;--fsmall:clamp(13px,1.25vw,26px);padding:0 var(--fpad) var(--fpad)}
+.foot .art{max-width:none;margin:0;aspect-ratio:16/9;background:none}
+.foot .art img{width:100%;height:100%;display:block;object-fit:contain}
+.foot .art .media{width:100%;height:100%;background:none}
+.foot .contact{display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;font-size:var(--fsmall);column-gap:var(--fgap);row-gap:16px;padding-top:1vw}
+.foot .contact>span{text-transform:uppercase}
+.foot .contact .pills{display:flex;justify-self:center;gap:.35em;position:relative;left:.4vw}
+.foot .contact .pill{font-size:calc(var(--fsmall)*.85);border-radius:.4em;padding:.45em .6em}
+.foot .contact time{justify-self:end}
+@media (max-width:760px){.foot .contact{grid-template-columns:1fr}.foot .contact .pills{justify-self:start;left:0}.foot .contact time{justify-self:start}}
 </style>
 </head>
 <body class="project">
@@ -179,6 +191,7 @@ a{color:inherit;text-decoration:none}img,video,iframe{display:block;max-width:10
 </main>
 <footer class="foot">
   <!--project-nav-->
+  <div class="art media"><img src="%BASE_URL%media/home/footer.jpg" alt="" loading="lazy" onerror="this.remove()"></div>
   <div class="contact"><span>LET'S GET IN TOUCH</span><div class="pills"><a class="pill" target="_blank" rel="noopener" href="https://www.instagram.com/oneashiish/">Instagram</a><a class="pill" target="_blank" rel="noopener" href="https://www.behance.net/ashiishkumar">Behance</a><a class="pill" target="_blank" rel="noopener" href="https://www.linkedin.com/in/oneashiish/">LinkedIn</a></div><time id="clock2"></time></div>
 </footer>
 <script>
