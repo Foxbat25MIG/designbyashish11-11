@@ -1621,7 +1621,7 @@
   }
   // Settings › Display › Car colour (stored in this browser; the 3D car repaints everywhere)
   const PAINTN = { ceramic: 'Midnight Ceramic Blue', lavender: 'Lavender silver', cloud: 'Cloud White', black: 'Deep Black', moon: 'New Moon Silver', southern: 'Southern Star Blue', gold: 'Sunlight Gold' };
-  function paintSync() { let k = 'ceramic'; try { k = localStorage.getItem('nio-paint') || k; } catch (e) {} if (!PAINTN[k]) k = 'ceramic';
+  function paintSync() { let k = 'lavender'; try { k = localStorage.getItem('nio-paint') || k; } catch (e) {} if (!PAINTN[k]) k = 'lavender';
     document.documentElement.style.setProperty('--paint', { ceramic: '#1d2540', lavender: '#b8b1d2', cloud: '#f2f1f5', black: '#202027', moon: '#a3a5ac', southern: '#33548c', gold: '#c8ad7c' }[k]);   /* the car in the camera feeds takes this colour */
     document.querySelectorAll('.pt-sw').forEach(s => s.classList.toggle('on', s.dataset.paint === k)); document.querySelectorAll('.pt-n').forEach(n => n.textContent = PAINTN[k]); }
   document.addEventListener('click', e => { const sw = e.target.closest('[data-paint]'); if (!sw) return; const k = sw.dataset.paint;
