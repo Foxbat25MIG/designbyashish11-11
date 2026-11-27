@@ -1,0 +1,2157 @@
+/* NIO ET9 HMI study · hi-fi system (Lavender Light). Tokens and components per nio/style-guide.md */
+:root{
+  /* Lavender Light tokens */
+  --bg:#f3f2f8; --s1:#ffffff; --s2:#eceaf3; --s3:#dcd9e7; --line:#dad7e4;
+  --t1:#1f1c29; --t2:#625f74; --t3:#8f8ba3;
+  --ink:#2d2840; --on-ink:#ffffff;            /* A · deep plum: the one primary action per view */
+  --sel:#cddcf7; --on-sel:#22304f; --sel-hover:#bfd1f3; /* E · morning sky: selected state */
+  --ease:cubic-bezier(.2,.8,.2,1); --dur-hover:240ms; --dur-press:140ms; --dur-panel:600ms;
+  --route:#7a6bf2; --route-soft:#e7e3fd;       /* guidance only */
+  --map-land:#eeedf4; --map-road:#ffffff; --map-road2:#f9f8fc; --map-bldg:#e3e1eb; --map-rail:#c9c5d8;
+  --map-park:#dde8de; --map-green:#e4ebe4; --map-water:#d8dff3; --map-edge:#d8d5e3; --route-done:#c9c4dc;
+  --shadow:0 10px 30px rgba(36,30,72,.10), 0 2px 6px rgba(36,30,72,.06);
+  --r-pane:28px; --r-card:22px; --r-ctl:16px;
+}
+*{box-sizing:border-box;margin:0}
+html,body{background:#e4e2ec}
+body{font-family:"Red Hat Text",sans-serif;color:var(--t1);-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 24px}
+.wrap{width:min(1440px,100%)}
+.cap{font-size:13px;color:#6b6880;letter-spacing:.04em;margin:0 0 12px}
+.scaler{position:relative;width:100%;aspect-ratio:1440/900;border-radius:calc(32px * var(--s,1));overflow:hidden;box-shadow:0 30px 80px rgba(36,30,72,.18)}
+.frame{position:absolute;left:0;top:0;width:1440px;height:900px;transform-origin:0 0;transform:scale(var(--s,1));background:var(--bg);font-size:20px}
+
+.ms{font-family:"Material Symbols Rounded";font-weight:normal;font-style:normal;line-height:1;white-space:nowrap;font-size:28px;color:var(--t2);font-variation-settings:"FILL" 0,"wght" 400,"GRAD" 0,"opsz" 24}
+.f{font-variation-settings:"FILL" 1,"wght" 400,"GRAD" 0,"opsz" 24}
+.num{font-family:"Red Hat Display";font-variant-numeric:tabular-nums}
+
+/* status bar */
+.status{position:absolute;left:36px;right:36px;top:0;height:56px;display:flex;align-items:center;justify-content:space-between;font-size:18px;color:var(--t2)}
+.status .l,.status .r{display:flex;align-items:center;gap:16px;min-width:420px}.status .r{justify-content:flex-end}
+.gear{display:flex;gap:2px;font:500 17px "Red Hat Display";background:var(--s2);border-radius:10px;padding:3px}
+.gear span{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--t3)}
+.gear span.on{background:var(--ink);color:var(--on-ink)}
+.chip{font:500 15px "Red Hat Text";color:var(--t1);background:var(--s1);border:1px solid var(--line);border-radius:999px;padding:5px 12px;display:flex;align-items:center;gap:6px}
+.speed{display:flex;align-items:baseline;gap:4px;color:var(--t1)}.speed b{font:500 24px "Red Hat Display";font-variant-numeric:tabular-nums}.speed small{font-size:14px;color:var(--t2)}
+.limit{width:36px;height:36px;border-radius:50%;border:4px solid #d94a4a;box-shadow:0 0 0 1px rgba(0,0,0,.06);background:#fff;display:flex;align-items:center;justify-content:center;font:700 14px "Red Hat Display";color:var(--t1)}
+.time{font:500 21px "Red Hat Display";color:var(--t1)}
+.status .ms{font-size:22px}
+
+/* content */
+.content{position:absolute;left:24px;right:24px;top:64px;bottom:128px;display:flex;gap:20px}
+.app{flex:2;position:relative;border-radius:var(--r-pane);overflow:hidden;background:var(--map-land)}
+.app::after{content:"";position:absolute;inset:0;border-radius:var(--r-pane);border:2px solid #cfcbdc;pointer-events:none;z-index:6}
+.ctx{flex:1;display:flex;flex-direction:column;gap:16px}
+.card{background:var(--s1);border-radius:var(--r-card);padding:24px;border:1px solid var(--line)}
+.float{position:absolute;background:var(--s1);border-radius:var(--r-card);box-shadow:var(--shadow);z-index:3}
+.lbl{font:500 13px "Red Hat Text";letter-spacing:.08em;color:var(--t3);text-transform:uppercase}
+.h1{font:500 40px "Red Hat Display";letter-spacing:-.01em;color:var(--t1)}
+.h2{font:500 28px "Red Hat Display";color:var(--t1)}
+.b1{font:500 20px "Red Hat Text";color:var(--t1)}
+.b2{font:400 17px "Red Hat Text";color:var(--t2)}
+.row{display:flex;align-items:center;gap:16px}.col{display:flex;flex-direction:column;gap:6px}
+.icb{width:64px;height:64px;border-radius:var(--r-ctl);display:flex;align-items:center;justify-content:center;background:var(--s1)}
+
+/* map controls */
+.mapctl{position:absolute;right:20px;top:20px;display:flex;flex-direction:column;gap:12px;z-index:3}
+.mapctl .icb{box-shadow:var(--shadow)}
+.seg{display:flex;background:var(--s1);border-radius:18px;padding:5px;gap:2px}
+.seg div{height:52px;padding:0 22px;border-radius:13px;display:flex;align-items:center;font:500 17px "Red Hat Text";color:var(--t2)}
+.seg div.on{background:var(--ink);color:var(--on-ink)}
+.lanes{display:flex;gap:6px;background:var(--s2);border-radius:12px;padding:8px 12px;align-items:center}
+.lanes .ms{font-size:26px;color:var(--t3)}.lanes .ms.go{color:var(--route)}
+
+/* media */
+.art{flex:1;border-radius:16px;background:linear-gradient(135deg,#e4e0f7,#d3cdea 60%,#c8c1e4);display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:13px;min-height:150px}
+.prog{height:6px;border-radius:3px;background:var(--s2)}.prog i{display:block;height:100%;width:42%;border-radius:3px;background:var(--ink)}
+.play{width:76px;height:76px;border-radius:50%;background:var(--ink);box-shadow:0 8px 20px rgba(17,16,20,.22);display:flex;align-items:center;justify-content:center}
+.play .ms{color:var(--on-ink);font-size:38px}
+
+/* dock */
+.dock{position:absolute;left:24px;right:24px;bottom:16px;height:100px;border-radius:var(--r-pane);background:var(--s1);border:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 14px}
+.clim{display:flex;align-items:center;gap:2px;width:260px}.clim.r{justify-content:flex-end}
+.clim .t{font:500 32px "Red Hat Display";width:100px;text-align:center;font-variant-numeric:tabular-nums}
+.clim .icb{background:transparent}
+.clim .side{font-size:12px;color:var(--t3);letter-spacing:.06em}
+.apps{display:flex;gap:4px;align-items:center}
+.dk{width:86px;height:76px;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font:500 13px "Red Hat Text";color:var(--t3)}
+.dk.on{background:var(--ink);color:var(--on-ink)}
+.dk.on .ms{color:var(--on-ink);font-variation-settings:"FILL" 1,"wght" 400,"GRAD" 0,"opsz" 24}
+.sep{width:1px;height:44px;background:var(--line);margin:0 6px}
+.dk.short{border:1.5px dashed var(--s3)}
+.lv{display:flex;gap:3px}.lv b{width:12px;height:4px;border-radius:2px;background:var(--t2)}.lv b.off{background:var(--s3)}
+/* heading-up map */
+.nm-vp{position:absolute;inset:0;overflow:hidden;transition:opacity .6s ease}
+.nm-vp.fade{opacity:0}
+.nm-world{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+.nm-labels{position:absolute;inset:0;pointer-events:none}
+.nm-labels>div{position:absolute;left:0;top:0;white-space:nowrap;will-change:transform}
+.nm-s{font:600 11.5px/1 "Red Hat Text",sans-serif;color:#7a7690;letter-spacing:.01em;text-shadow:0 0 3px var(--map-land),0 0 3px var(--map-land),0 0 2px var(--map-land)}
+.nm-d{font:600 11px/1 "Red Hat Text",sans-serif;color:#a29eb5;letter-spacing:.16em;text-transform:uppercase;text-shadow:0 0 3px var(--map-land),0 0 3px var(--map-land)}
+.nm-car{position:absolute;left:218px;top:508px;width:64px;height:64px}
+.nm-pin{display:flex;align-items:center;gap:8px;flex-direction:row;background:var(--s1);border-radius:14px;padding:6px 12px 6px 6px;box-shadow:var(--shadow)}
+.nm-pin-dot{width:28px;height:28px;border-radius:9px;background:var(--route);color:#fff;font:700 15px "Red Hat Display";display:flex;align-items:center;justify-content:center}
+.nm-pin.left{flex-direction:row-reverse;padding:6px 6px 6px 12px}.nm-pin.left .nm-pin-t{align-items:flex-end}
+.nm-pin-t{font:500 14px "Red Hat Text";color:var(--t1);display:flex;flex-direction:column;line-height:1.15}.nm-pin-t small{font-size:12px;color:var(--t2)}
+.osm{position:absolute;right:92px;bottom:6px;font:500 10.5px "Red Hat Text",sans-serif;color:var(--t3);opacity:.85}
+/* interaction states (shared) */
+.icb,.dk,.seg div,.play,.chip,[data-press]{transition:transform .12s ease,background-color .15s ease,box-shadow .15s ease;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.icb:hover,.dk:not(.on):hover,.seg div:not(.on):hover{background-color:var(--s2)}
+.icb:active,.dk:active,.seg div:active,.play:active,[data-press]:active{transform:scale(.96)}
+.icb:focus-visible,.dk:focus-visible,.seg div:focus-visible,.play:focus-visible{outline:3px solid var(--route);outline-offset:2px}
+.dk.on:hover{background:#26242c}
+
+/* ---------- batch page ---------- */
+.screen{margin:0 0 56px}
+.screen h2{font:500 22px "Red Hat Display";color:#2a2833;margin:0 0 4px}
+.screen p.note{font:400 15px "Red Hat Text";color:#6b6880;margin:0 0 14px;max-width:900px}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 28px}
+.toc a{font:500 14px "Red Hat Text";color:#2a2833;text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 14px}
+.disc{font:400 13px "Red Hat Text";color:#6b6880;margin:8px 0 0}
+
+/* ---------- shared components (added for Batch 1) ---------- */
+.pane{flex:2;position:relative;border-radius:var(--r-pane);background:var(--s2);padding:24px;display:flex;gap:20px;overflow:hidden}
+.pane.plain{background:transparent;padding:0}
+.ctx .card.grow{flex:1}
+.h3{font:500 22px "Red Hat Text";color:var(--t1)}
+.metric{font:500 24px "Red Hat Display";font-variant-numeric:tabular-nums;color:var(--t1)}
+.cap14{font:400 14px "Red Hat Text";color:var(--t2)}
+.bs{font:400 15px "Red Hat Text";color:var(--t2)}
+.sp{flex:1}
+.divider{height:1px;background:var(--line)}
+
+/* side navigation (Car, Settings) */
+.snav{width:236px;display:flex;flex-direction:column;gap:4px;flex:none}
+.snav div{height:56px;border-radius:var(--r-ctl);display:flex;align-items:center;gap:14px;padding:0 16px;font:500 17px "Red Hat Text";color:var(--t2);cursor:pointer;transition:background-color .15s}
+.snav div .ms{font-size:24px}
+.snav div:hover{background:var(--s3)}
+.snav div.on{background:var(--s1);color:var(--t1);box-shadow:0 1px 2px rgba(36,30,72,.06)}
+.snav div.on .ms{color:var(--t1);font-variation-settings:"FILL" 1,"wght" 400,"GRAD" 0,"opsz" 24}
+
+/* buttons */
+.btn{height:64px;border-radius:var(--r-ctl);display:flex;align-items:center;justify-content:center;gap:10px;font:500 18px "Red Hat Text";padding:0 22px;cursor:pointer;transition:transform .12s,background-color .15s}
+.btn:active{transform:scale(.96)}
+.btn.pri{background:var(--ink);color:var(--on-ink)}.btn.pri .ms{color:var(--on-ink)}
+.btn.sec{background:var(--s1);color:var(--t1);border:1px solid var(--line)}.btn.sec .ms{color:var(--t1)}
+.btn.ghost{background:var(--s2);color:var(--t1)}
+.btn.sm{height:48px;font-size:16px;padding:0 16px;border-radius:14px}
+
+/* toggle */
+.tog{width:52px;height:32px;border-radius:16px;background:var(--s3);position:relative;flex:none;transition:background-color .15s}
+.tog::after{content:"";position:absolute;left:3px;top:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.15);transition:left .15s}
+.tog.on{background:var(--ink)}.tog.on::after{left:23px}
+
+/* key/value list */
+.kv{display:flex;flex-direction:column}
+.kv>div{display:flex;justify-content:space-between;align-items:center;height:52px;border-bottom:1px solid var(--line);font:400 17px "Red Hat Text";color:var(--t2)}
+.kv>div:last-child{border-bottom:0}
+.kv b{font:500 17px "Red Hat Text";color:var(--t1)}
+
+/* tiles */
+.tile{background:var(--s1);border:1px solid var(--line);border-radius:18px;padding:16px 18px;display:flex;flex-direction:column;gap:4px}
+.tile .ms{font-size:26px;color:var(--t1)}
+.qbtn{flex:1;height:84px;background:var(--s1);border:1px solid var(--line);border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font:500 14px "Red Hat Text";color:var(--t1);cursor:pointer;transition:transform .12s}
+.qbtn .ms{color:var(--t1);font-size:28px}.qbtn:active{transform:scale(.96)}
+.qbtn.on{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}.qbtn.on .ms{color:var(--on-ink);font-variation-settings:"FILL" 1,"wght" 400,"GRAD" 0,"opsz" 24}
+
+/* placeholder (named slot) */
+.ph{border-radius:16px;background:linear-gradient(135deg,#e4e0f7,#d3cdea 60%,#c8c1e4);display:flex;align-items:center;justify-content:center;color:#8f8aa6;font:400 12px "Red Hat Text";text-align:center;padding:8px}
+.ph.round{border-radius:50%}
+.ph.dark{background:linear-gradient(160deg,#2b2934,#1b1a21);color:#8a8699}
+
+/* warnings */
+.warnpill{display:flex;align-items:center;gap:10px;background:var(--s1);border-radius:16px;padding:12px 16px 12px 12px;box-shadow:var(--shadow);font:500 17px "Red Hat Text";color:var(--t1)}
+.warnpill .ic{width:36px;height:36px;border-radius:10px;background:#d94a4a;display:flex;align-items:center;justify-content:center}
+.warnpill .ic .ms{color:#fff;font-size:22px}
+.warnbar{background:#d94a4a;color:#fff;border-radius:14px;display:flex;align-items:center;gap:10px;padding:12px 16px;font:500 17px "Red Hat Text"}
+.warnbar .ms{color:#fff;font-size:24px}
+.edge-warn{position:absolute;top:0;bottom:0;right:0;width:10px;background:linear-gradient(90deg,rgba(217,74,74,0),rgba(217,74,74,.85));z-index:4}
+.blink{animation:blink 1s steps(2,start) infinite}
+@keyframes blink{to{visibility:hidden}}
+@media (prefers-reduced-motion:reduce){.blink{animation:none}}
+
+/* mini player */
+.mini{display:flex;align-items:center;gap:16px;padding:16px 16px 16px 16px}
+.mini .ph{width:64px;height:64px;border-radius:12px;font-size:9px}
+.mini .play{width:56px;height:56px}.mini .play .ms{font-size:30px}
+
+/* edit layout */
+.editbar{position:absolute;left:24px;right:24px;top:64px;height:76px;border-radius:var(--r-card);background:var(--s1);box-shadow:var(--shadow);display:flex;align-items:center;gap:14px;padding:0 14px 0 22px;z-index:5}
+.dash{outline:2px dashed #b9b3d1;outline-offset:6px}
+.handle{position:absolute;top:14px;right:14px;width:48px;height:48px;border-radius:14px;background:var(--s1);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;z-index:2}
+.handle .ms{color:var(--t1);font-size:26px}
+.dim{opacity:.45;pointer-events:none}
+
+/* segmented (generic) */
+.segx{display:flex;background:var(--s2);border-radius:18px;padding:5px;gap:2px}
+.segx div{flex:1;height:56px;border-radius:13px;display:flex;align-items:center;justify-content:center;gap:8px;font:500 17px "Red Hat Text";color:var(--t2);cursor:pointer}
+.segx div .ms{font-size:22px}
+.segx div.on{background:var(--ink);color:var(--on-ink)}.segx div.on .ms{color:var(--on-ink)}
+
+/* slider */
+.slider{height:8px;border-radius:4px;background:var(--s3);position:relative}
+.slider i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--ink)}
+.slider b{position:absolute;top:50%;width:28px;height:28px;margin:-14px 0 0 -14px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+
+/* =========================================================
+   v2 · feedback round (Nov 18): selection = morning sky,
+   primary = deep plum, Apple-style type hierarchy, one easing.
+   ========================================================= */
+/* selection (E) */
+.gear span.on,.seg div.on,.segx div.on,.dk.on,.qbtn.on{background:var(--sel);color:var(--on-sel);border-color:var(--sel)}
+.dk.on .ms,.segx div.on .ms,.qbtn.on .ms{color:var(--on-sel)}
+.dk.on:hover{background:var(--sel-hover)}
+.tog.on{background:#6f8fd0}
+.btn.tint{background:var(--sel);color:var(--on-sel)}.btn.tint .ms{color:var(--on-sel)}
+/* type hierarchy (Apple HIG: hierarchy from size and colour; Regular by default, one emphasis weight) */
+.h1{font-weight:400}.h2{font-weight:400}.b1{font-weight:400}.h3{font-weight:500}
+.em{font-weight:500}
+.metric{font-weight:400}
+.lbl{font-size:12px;color:var(--t3)}
+.chip{font-weight:400}
+.snav div{font-weight:400}.snav div.on{font-weight:500}
+.btn{font-weight:500}
+/* one standard motion for every control */
+.icb,.dk,.seg div,.segx div,.play,.chip,.btn,.qbtn,.snav div,.tog,.tog::after,.mode,.opt span,[data-tap]{transition:background-color var(--dur-hover) var(--ease),color var(--dur-hover) var(--ease),box-shadow var(--dur-hover) var(--ease),transform var(--dur-press) var(--ease),left var(--dur-hover) var(--ease);cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+.icb:active,.dk:active,.seg div:active,.segx div:active,.play:active,.btn:active,.qbtn:active,.mode:active,[data-tap]:active{transform:scale(.96)}
+
+/* site bar (outside the frame) */
+.sitebar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 14px}
+.sitebar .cap{margin:0}
+.sound{display:flex;align-items:center;gap:8px;font:500 14px "Red Hat Text";color:#2a2833;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 14px 6px 10px;cursor:pointer}
+.sound .ms{font-size:20px;color:#2a2833}
+
+/* sliders */
+.sl{position:relative;height:6px;border-radius:3px;background:var(--s2);cursor:pointer;touch-action:none}
+.sl::before{content:"";position:absolute;inset:-14px 0}
+.sl i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:var(--ink);width:var(--v,40%)}
+.sl b{position:absolute;top:50%;left:var(--v,40%);width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(36,30,72,.25);opacity:0;transition:opacity var(--dur-hover) var(--ease)}
+.sl:hover b,.sl.drag b{opacity:1}
+
+/* player · Walkman-inspired: modern layout, cassette reels + level meter */
+.player{display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.player .art{min-height:110px}
+.deck{display:flex;align-items:center;gap:14px;height:52px;padding:0 14px;border-radius:14px;background:var(--s2)}
+.reel{width:34px;height:34px;flex:none;animation:spin 2.4s linear infinite;animation-play-state:paused}
+.player.playing .reel{animation-play-state:running}
+@keyframes spin{to{transform:rotate(360deg)}}
+.meter{flex:1;display:flex;align-items:flex-end;justify-content:center;gap:3px;height:26px}
+.meter i{width:5px;border-radius:2px;background:#8b9fd6;height:20%;transition:height .12s linear}
+.vol{display:flex;align-items:center;gap:12px}
+.vol .ms{font-size:22px;color:var(--t2);cursor:pointer}
+.vol .sl{flex:1;height:4px}
+.dvol{display:flex;align-items:center;gap:10px;height:76px;padding:0 14px;border-radius:18px}
+.dvol .ms{font-size:24px;color:var(--t2);cursor:pointer}
+.dvol .sl{width:120px;height:4px}
+.player .compact-row{display:none}
+.player.compact .full-only{display:none}
+.player.compact .compact-row{display:flex}
+@media (prefers-reduced-motion:reduce){.reel{animation:none}}
+
+/* nav views: Serene / Map / Car */
+.app .nm-world svg:first-child{transition:opacity var(--dur-panel) var(--ease)}
+.app .nm-labels,.app .mapctl{transition:opacity var(--dur-panel) var(--ease)}
+.app.v-serene .nm-world svg:first-child{opacity:.18}
+.app.v-serene .nm-labels .nm-s,.app.v-serene .nm-labels .nm-d,.app.v-serene .mapctl{opacity:0}
+.app.v-serene .nm-labels{opacity:1}
+.carview{position:absolute;inset:0;z-index:2;background:linear-gradient(180deg,#e9e7f1,#dedbe8);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity var(--dur-panel) var(--ease)}
+.app.v-car .carview{opacity:1}
+.carview .lane{position:absolute;top:0;bottom:0;width:6px;background:repeating-linear-gradient(180deg,#fff 0 34px,transparent 34px 64px);opacity:.9}
+
+/* blind spot loop */
+.bs-red{opacity:0;transition:opacity .5s var(--ease)}
+.bs-on .bs-red{opacity:1}
+.bscam{flex:0 1 0;min-height:0;opacity:0;padding:0 24px;border-width:0;overflow:hidden;transition:flex-grow var(--dur-panel) var(--ease),opacity .4s var(--ease),padding var(--dur-panel) var(--ease)}
+.bs-on .bscam{flex-grow:1;opacity:1;padding:24px;border-width:2px}
+.bs-ind{opacity:0;transition:opacity .3s}
+.bs-sig .bs-ind{opacity:1}
+.mapicon{position:absolute;width:52px;height:52px;border-radius:16px;background:#d94a4a;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(217,74,74,.35);z-index:3}
+.mapicon .ms{color:#fff;font-size:28px}
+
+/* drive modes */
+.mode{flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font:400 19px "Red Hat Text";color:var(--t1)}
+.mode.on{background:var(--sel) !important;color:var(--on-sel);font-weight:500}
+.mode .ms{color:var(--on-sel);opacity:0}.mode.on .ms{opacity:1}
+.kv b{font-weight:500;transition:color .3s}
+.kv b.flash{color:#4f6fb8}
+.opt{display:flex;gap:4px;background:var(--s2);border-radius:12px;padding:3px}
+.opt span{height:36px;padding:0 12px;border-radius:9px;display:flex;align-items:center;font:400 15px "Red Hat Text";color:var(--t2)}
+.opt span.on{background:var(--sel);color:var(--on-sel);font-weight:500}
+.toast{position:absolute;left:50%;bottom:150px;transform:translate(-50%,12px);background:var(--ink);color:#fff;font:500 16px "Red Hat Text";border-radius:999px;padding:12px 20px;display:flex;align-items:center;gap:8px;opacity:0;pointer-events:none;transition:opacity .3s var(--ease),transform .3s var(--ease);z-index:20}
+.toast .ms{color:#fff;font-size:20px}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* home (quiet hierarchy) */
+.hrow{display:flex;align-items:center;gap:18px;padding:14px 4px;border-bottom:1px solid var(--line)}
+.hrow:last-child{border-bottom:0}
+.custom>div{display:flex;justify-content:space-between;align-items:center;height:56px;border-bottom:1px solid var(--line);font:400 17px "Red Hat Text";color:var(--t2)}
+.custom>div:last-child{border-bottom:0}
+.player{transition:flex-grow var(--dur-panel) var(--ease)}
+.player.compact{flex-grow:0 !important}
+.app.v-car .nm-labels{opacity:0}
+.clim{width:226px}.clim .t{width:88px;font-weight:400}
+.dk{width:78px}
+.dvol{padding:0 8px}.dvol .sl{width:96px}
+.player.compact{flex:0 0 auto !important}
+/* v3 · tape deck, TE-style meter, top-down car view, fixes */
+.deck{height:auto;padding:0;background:none;display:block}
+.tape{display:block;width:100%;height:64px}
+.tape .reel{transform-box:fill-box;transform-origin:center;width:auto;height:auto}
+.temeter{display:flex;gap:3px;align-items:flex-end;height:30px;flex:none}
+.temeter span{display:flex;flex-direction:column-reverse;gap:2px}
+.temeter i{display:block;width:6px;height:3px;border-radius:1px;background:#dcd9e6}
+.temeter i.on{background:var(--ink)}
+.temeter i.top{background:#7f9be0}
+.carview{background:#e7e5ef}
+.app.v-car .dash{animation:road .9s linear infinite}
+@keyframes road{to{stroke-dashoffset:-64}}
+@media (prefers-reduced-motion:reduce){.app.v-car .dash{animation:none}}
+.bscam{margin-bottom:-16px;transition:flex-grow var(--dur-panel) var(--ease),opacity .4s var(--ease),padding var(--dur-panel) var(--ease),margin var(--dur-panel) var(--ease)}
+.bs-on .bscam{margin-bottom:0}
+.custom .opt{width:300px}
+.custom .opt span{flex:1;justify-content:center;padding:0 8px}
+/* v4 · layered player (smooth compact/expand), width-aware tape, synced car view, custom grid */
+.player{position:relative;display:block}
+.player.grow{flex:1 1 0}
+.player.fixed{flex:none !important;height:112px}
+.p-full{position:absolute;inset:24px;display:flex;flex-direction:column;gap:12px;transition:opacity .4s var(--ease) .3s}
+.p-compact{position:absolute;left:24px;right:24px;top:24px;height:64px;display:flex;align-items:center;gap:16px;opacity:0;pointer-events:none;transition:opacity .3s var(--ease)}
+.player.compact .p-full{opacity:0;pointer-events:none;transition:opacity .2s var(--ease) 0s}
+.player.compact .p-compact{opacity:1;pointer-events:auto;transition:opacity .35s var(--ease) .45s}
+.deck{height:64px;flex:none}
+.tape{width:100%;height:64px}
+[data-blindspot] .ctx .bscam{flex:none;height:0;margin-bottom:-16px;transition:height .8s cubic-bezier(.45,0,.2,1),margin .8s cubic-bezier(.45,0,.2,1),padding .8s cubic-bezier(.45,0,.2,1),opacity .35s var(--ease)}
+[data-blindspot].bs-on .ctx .bscam{height:580px;margin-bottom:0;transition:height .8s cubic-bezier(.45,0,.2,1),margin .8s cubic-bezier(.45,0,.2,1),padding .8s cubic-bezier(.45,0,.2,1),opacity .45s var(--ease) .3s}
+[data-blindspot] .ctx .player{flex:none !important;height:708px;transition:height .8s cubic-bezier(.45,0,.2,1)}
+[data-blindspot].bs-on .ctx .player{height:112px}
+.app.v-car .dash{animation:none}
+.custom>div{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;align-items:center}
+.custom .opt{width:auto;min-width:0}
+.custom .opt span{min-width:0;flex:1 1 0;padding:0 4px}
+.m-desc{flex:1;min-width:0}
+.app.v-car .mapicon{visibility:hidden}
+/* car view motion: road markings roll under the car; traffic drifts; cyclist passes during the blind-spot event */
+.app.v-car .roadmove{animation:roll 1.6s linear infinite}
+@keyframes roll{from{transform:translateY(0)}to{transform:translateY(384px)}}
+.app.v-car .ego{animation:sway 3.2s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:translateX(0)}50%{transform:translateX(3px)}}
+.app.v-car .car-ahead{animation:ahead 7s ease-in-out infinite alternate}
+@keyframes ahead{from{transform:translateY(0)}to{transform:translateY(-36px)}}
+.app.v-car .car-behind{animation:behind 9s ease-in-out infinite alternate}
+@keyframes behind{from{transform:translateY(0)}to{transform:translateY(28px)}}
+.cyclist{transition:transform 4s linear}
+.bs-on .cyclist{transform:translateY(-70px)}
+@media (prefers-reduced-motion:reduce){.app.v-car .roadmove,.app.v-car .ego,.app.v-car .car-ahead,.app.v-car .car-behind{animation:none}}
+/* car view v2: only the road moves (no sway/drift); hero turns right in a 5 s loop */
+.app.v-car .ego,.app.v-car .car-ahead,.app.v-car .car-behind{animation:none}
+.cv-world{transition:opacity .4s var(--ease)}
+.cv-world.fade{opacity:0}
+/* ---------- clickable prototype ---------- */
+.screens{flex:2;position:relative;min-width:0}
+.scr{position:absolute;inset:0;display:none}
+.scr.on{display:flex;animation:scrin var(--dur-panel) var(--ease)}
+@keyframes scrin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.scr>.app,.scr>.pane{flex:1}
+.pages{flex:1;position:relative;min-width:0;display:flex}
+.pg{display:none;flex:1;min-width:0}
+.pg.on{display:flex;animation:scrin .45s var(--ease)}
+.pgc{flex:1;gap:16px;min-width:0}
+.scard{display:flex;flex-direction:column;gap:2px;padding:16px 22px}
+.scard .lbl{margin-bottom:6px}
+.srow{display:flex;justify-content:space-between;align-items:center;min-height:48px;gap:16px}
+.srow+.srow,.setsl+.srow,.srow+.setsl{border-top:1px solid var(--line)}
+.setsl{display:grid;grid-template-columns:140px minmax(0,1fr) 72px;align-items:center;gap:16px;height:44px;font:400 17px "Red Hat Text";color:var(--t1)}
+.setsl .sl{height:4px}
+.setsl .val{text-align:right;color:var(--t2);font-size:16px}
+.swatches{display:flex;gap:14px;padding:4px 0 10px}
+.sw{width:44px;height:44px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(36,30,72,.12);cursor:pointer}
+.sw.on{box-shadow:0 0 0 3px #fff,0 0 0 5px var(--on-sel)}
+.prof{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;cursor:pointer}
+.prof.on{box-shadow:0 0 0 3px var(--sel)}
+.mem .btn.on{background:var(--sel);color:var(--on-sel);border-color:var(--sel)}
+.proto .status .r .ms[data-go]{font-size:24px;color:var(--t1)}
+/* ---------- bottom-bar screens: Media, Phone, Apps, NOMI ---------- */
+.tabpanes{flex:1;min-height:0;position:relative}
+.tp{display:none;height:100%;overflow:auto;scrollbar-width:none}
+.tp::-webkit-scrollbar{display:none}
+.tp.on{display:block;animation:scrin .4s var(--ease)}
+.lrow{display:flex;align-items:center;gap:16px;min-height:64px;padding:6px 0;border-top:1px solid var(--line);cursor:pointer}
+.scard .lbl+.lrow{border-top:0}
+.radio-f{font:400 72px/1 "Red Hat Display";color:var(--t1);letter-spacing:-.02em}
+.dial{width:100%;height:28px;margin-top:10px;background:repeating-linear-gradient(90deg,var(--t3) 0 1px,transparent 1px 12px);opacity:.5;position:relative;border-radius:4px}
+.dial i{position:absolute;top:-4px;bottom:-4px;left:42%;width:3px;border-radius:2px;background:var(--ink);transition:left .5s var(--ease)}
+.fav{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:24px;cursor:pointer;text-align:center}
+.callbtn{width:52px;height:52px;border-radius:50%;background:#2fae6a;display:flex;align-items:center;justify-content:center;margin-top:8px;cursor:pointer;transition:transform var(--dur-press) var(--ease)}
+.callbtn.big{width:72px;height:72px}
+.callbtn:active{transform:scale(.94)}
+.kp{display:grid;grid-template-columns:repeat(3,92px);gap:10px}
+.key{height:64px;border-radius:16px;background:var(--s1);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:background-color var(--dur-hover) var(--ease),transform var(--dur-press) var(--ease)}
+.key:hover{background:var(--s2)}.key:active{transform:scale(.95)}
+.key b{font:400 26px "Red Hat Display";color:var(--t1)}.key small{font:500 10px "Red Hat Text";letter-spacing:.12em;color:var(--t3);min-height:12px}
+.kp-num{font:400 34px "Red Hat Display";color:var(--t1);min-width:260px;text-align:center}
+.callov{position:absolute;left:24px;top:64px;width:912px;height:708px;border-radius:var(--r-pane);background:rgba(243,242,248,.97);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:56px;z-index:30;opacity:0;pointer-events:none;transform:scale(.98);transition:opacity .35s var(--ease),transform .35s var(--ease)}
+.callov.on{opacity:1;pointer-events:auto;transform:none}
+.cbtn{width:84px;height:84px;border-radius:50%;background:var(--s1);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;transition:background-color var(--dur-hover) var(--ease),transform var(--dur-press) var(--ease)}
+.cbtn small{font:500 12px "Red Hat Text";color:var(--t2)}
+.cbtn.on{background:var(--sel);border-color:var(--sel)}
+.cbtn.end{background:#d94a4a;border-color:#d94a4a}.cbtn.end small{color:#fff}
+.cbtn:active{transform:scale(.95)}
+.agrid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px 10px;flex:1;align-content:start}
+.atile{display:flex;flex-direction:column;align-items:center;gap:8px;font:400 14px "Red Hat Text";color:var(--t1);cursor:pointer;padding:6px;border-radius:16px;transition:background-color var(--dur-hover) var(--ease),transform var(--dur-press) var(--ease)}
+.atile:hover{background:var(--s3)}.atile:active{transform:scale(.95)}
+.aico{width:68px;height:68px;border-radius:20px;display:flex;align-items:center;justify-content:center}
+.camgrid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:12px;height:100%}
+.chess{display:grid;grid-template-columns:repeat(8,52px);grid-template-rows:repeat(8,52px);border-radius:12px;overflow:hidden}
+.chess i{display:flex;align-items:center;justify-content:center;font:400 34px/1 serif;font-style:normal;color:var(--t1);cursor:pointer}
+.chess .lt1{background:#eceaf3}.chess .dk1{background:#c9c4dc}
+.chess i.sel{box-shadow:inset 0 0 0 4px var(--route)}
+.sudoku{display:grid;grid-template-columns:repeat(9,46px);grid-template-rows:repeat(9,46px);background:var(--s1);border:2px solid var(--t2);border-radius:8px;overflow:hidden}
+.sudoku i{display:flex;align-items:center;justify-content:center;font:400 22px "Red Hat Display";font-style:normal;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.sudoku .giv{color:var(--t1);font-weight:500}.sudoku .emp{color:#4f6fb8;cursor:pointer}.sudoku .emp:hover{background:var(--s2)}
+.sudoku .bx{border-right:2px solid var(--t2)}.sudoku .by{border-bottom:2px solid var(--t2)}
+.trivia .ans.ok{background:#d5ead8;border-color:#9ccfa6}.trivia .ans.no{background:#f6d9d9;border-color:#e8a9a9}
+.nomiov{position:absolute;inset:0;z-index:40;display:flex;align-items:flex-end;justify-content:center;padding-bottom:132px;background:rgba(31,28,41,.12);opacity:0;pointer-events:none;transition:opacity .35s var(--ease)}
+.nomiov.on{opacity:1;pointer-events:auto}
+.nomi-card{width:760px;background:var(--s1);border-radius:28px;box-shadow:0 20px 60px rgba(36,30,72,.18);padding:22px 24px;display:flex;flex-direction:column;gap:16px;transform:translateY(16px);transition:transform .4s var(--ease)}
+.nomiov.on .nomi-card{transform:none}
+.orb{width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#e7e3fd,#9b8ffa 55%,#6f8fd0);animation:orb 1.6s ease-in-out infinite}
+@keyframes orb{50%{transform:scale(1.08);filter:brightness(1.08)}}
+@media (prefers-reduced-motion:reduce){.orb{animation:none}}
+.nomi-log{display:flex;flex-direction:column;gap:10px}
+.nomi-log .me{align-self:flex-end;background:var(--sel);color:var(--on-sel);border-radius:18px 18px 4px 18px;padding:10px 16px;font:400 17px "Red Hat Text"}
+.nomi-log .ai{align-self:flex-start;background:var(--s2);color:var(--t1);border-radius:18px 18px 18px 4px;padding:12px 16px;font:400 17px "Red Hat Text";max-width:80%}
+.nomi-log .acts{display:flex;gap:10px}
+.chip2{height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--line);background:var(--s1);display:flex;align-items:center;font:400 15px "Red Hat Text";color:var(--t1);cursor:pointer;transition:background-color var(--dur-hover) var(--ease),transform var(--dur-press) var(--ease)}
+.chip2:hover{background:var(--s2)}.chip2:active{transform:scale(.96)}
+/* ---------- round 6 ---------- */
+.srow{padding:8px 0}
+.clim .t{width:96px}
+/* player: radio has no timeline; tape runs while playing */
+.livebadge{display:none;align-items:center;gap:8px;font:500 13px "Red Hat Text";letter-spacing:.06em;color:#d94a4a}
+.livebadge i{width:8px;height:8px;border-radius:50%;background:#d94a4a;animation:blinkdot 1.6s ease-in-out infinite}
+@keyframes blinkdot{50%{opacity:.3}}
+.player.radio .livebadge{display:flex}
+.player.radio .p-progrow{display:none}
+.art[data-pick]{cursor:pointer}
+.pickerov{position:absolute;inset:0;z-index:45;background:rgba(31,28,41,.14);display:flex;align-items:center;justify-content:flex-end;padding:64px 24px 128px;opacity:0;pointer-events:none;transition:opacity .35s var(--ease)}
+.pickerov.on{opacity:1;pointer-events:auto}
+.picker{width:457px;height:100%;background:var(--s1);border-radius:var(--r-card);box-shadow:0 20px 60px rgba(36,30,72,.18);padding:20px 22px;display:flex;flex-direction:column;gap:12px;transform:translateX(16px);transition:transform .4s var(--ease)}
+.pickerov.on .picker{transform:none}
+.pk-list{flex:1;overflow:auto;scrollbar-width:none;display:flex;flex-direction:column;gap:14px}
+.pk-art{display:flex;flex-direction:column}
+.pk-row{display:flex;align-items:center;gap:12px;min-height:48px;padding:0 10px;border-radius:12px;cursor:pointer;transition:background-color var(--dur-hover) var(--ease)}
+.pk-row:hover{background:var(--s2)}.pk-row.on{background:var(--sel)}.pk-row.on .b2{color:var(--on-sel)!important}
+/* dashboard: camera opens above the player, player shrinks smoothly */
+[data-dash] .ctx .bscam{flex:none !important;height:0;margin-bottom:-16px;transition:height .8s cubic-bezier(.45,0,.2,1),margin .8s cubic-bezier(.45,0,.2,1),padding .8s cubic-bezier(.45,0,.2,1),opacity .4s var(--ease)}
+[data-dash].bs-on .ctx .bscam{margin-bottom:0;opacity:1;padding:24px;border-width:2px}
+[data-dash] .ctx .player,[data-dash] .ctx .player.compact{flex:1 1 0 !important;height:auto;min-height:112px}
+/* traffic light */
+.carview .tl-r,.carview .tl-y,.carview .tl-g{fill:#4b4560}
+.carview.tl-red .tl-r{fill:#ff5a5a}.carview.tl-green .tl-g{fill:#3fd07f}
+.tl-dot{width:14px;height:14px;border-radius:50%;background:#d94a4a;box-shadow:0 0 0 4px rgba(217,74,74,.18);transition:background-color .3s,box-shadow .3s}
+.carview.tl-green .tl-dot{background:#2fae6a;box-shadow:0 0 0 4px rgba(47,174,106,.18)}
+/* phone */
+.favgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.fav{padding:18px}
+/* video */
+.ytbox{position:relative;flex:1;min-height:0;border-radius:var(--r-card);overflow:hidden;background:#1b1a21}
+.ytbox iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:none}
+.ytbox.playing iframe{display:block}
+.ytlock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}
+.ytbox.playing .ytlock{display:none}
+.chip2.on{background:var(--sel);border-color:var(--sel);color:var(--on-sel)}
+/* cleaning */
+.cleanov{position:absolute;inset:0;z-index:60;background:rgba(31,28,41,.88);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;opacity:0;pointer-events:none;transition:opacity .4s var(--ease)}
+.cleanov.on{opacity:1;pointer-events:auto}
+/* games */
+.gamewrap{display:flex;align-items:center;justify-content:center;gap:32px;height:100%}
+.gside .btn{align-self:flex-start}
+.chess i.pw{color:#fff;-webkit-text-stroke:1.2px #2d2840}
+.chess i.pb{color:#2d2840}
+.chess i.tgt{box-shadow:inset 0 0 0 999px rgba(122,107,242,.22)}
+.chess i.sel{box-shadow:inset 0 0 0 4px var(--route)}
+.sudoku i.sel{background:var(--sel)}
+.sudoku i.bad{color:#d94a4a;background:#f6d9d9}
+.numpad{display:grid;grid-template-columns:repeat(5,44px);gap:8px}
+.numpad .key{height:44px;border-radius:12px}
+.numpad .key b{font-size:20px}
+.trivia .btn.ok{background:#d5ead8;border-color:#9ccfa6}.trivia .btn.no{background:#f6d9d9;border-color:#e8a9a9}
+/* ---------- round 7 ---------- */
+.cov,.art.cov{background-size:cover;background-position:center;color:transparent}
+.ell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.callbtn.sm{width:40px;height:40px;margin:0 0 0 12px;flex:none}
+/* apps: five labelled groups, all on one screen */
+.agroups{display:grid;grid-template-columns:1fr 1fr;gap:16px;flex:1;min-height:0}
+.acol{display:flex;flex-direction:column;gap:16px}
+.agroup{background:var(--s1);border-radius:var(--r-card);padding:14px 16px 10px;display:flex;flex-direction:column;gap:8px}
+.agroup .agrid{grid-template-columns:repeat(5,1fr);gap:4px;flex:none}
+.agroup .aico{width:56px;height:56px;border-radius:16px}
+.agroup .aico .ms{font-size:26px!important}
+.agroup .atile{font-size:13px;gap:6px;padding:6px 2px;text-align:center}
+.agroup .atile:hover{background:var(--s2)}
+/* parking flow */
+.pflow{height:100%}
+.pst{display:none;height:100%;overflow:auto;scrollbar-width:none}
+.pst.on{display:block;animation:scrin .4s var(--ease)}
+.pchips>div{flex:1}
+.htoast{position:absolute;left:50%;bottom:150px;z-index:70;transform:translate(-50%,12px);background:var(--ink);color:#fff;font:500 16px "Red Hat Text";border-radius:999px;padding:12px 20px;opacity:0;pointer-events:none;transition:opacity .3s var(--ease),transform .3s var(--ease)}
+.htoast.show{opacity:1;transform:translate(-50%,0)}
+/* 2048 */
+.b2048{display:grid;grid-template-columns:repeat(4,96px);grid-template-rows:repeat(4,96px);gap:10px;padding:10px;background:#cfcbdc;border-radius:16px;touch-action:none;user-select:none}
+.b2048 i{display:flex;align-items:center;justify-content:center;border-radius:10px;background:#e4e1ee;font:500 34px "Red Hat Display";font-style:normal;color:var(--t1);transition:background-color .15s}
+.b2048 .t2{background:#f4f2fa}.b2048 .t4{background:#ebe6fb}.b2048 .t8{background:#d9d0fb}.b2048 .t16{background:#c6b9f7}
+.b2048 .t32{background:#b3a2f4}.b2048 .t64{background:#9d88f1;color:#fff}.b2048 .t128{background:#8a72ee;color:#fff;font-size:30px}
+.b2048 .t256{background:#7a6bf2;color:#fff;font-size:30px}.b2048 .t512{background:#6a55e0;color:#fff;font-size:30px}
+.b2048 .t1024,.b2048 .t2048,.b2048 .t4096{background:#2d2840;color:#fff;font-size:26px}
+.arrows{display:grid;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(2,56px);gap:6px}
+.arrows .key{height:56px;border-radius:14px}
+/* minesweeper */
+.bmines{display:grid;grid-template-columns:repeat(9,48px);grid-template-rows:repeat(9,48px);gap:3px;padding:6px;background:#cfcbdc;border-radius:14px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.bmines i{display:flex;align-items:center;justify-content:center;border-radius:8px;background:#ebe8f4;font:600 22px "Red Hat Display";font-style:normal;cursor:pointer;transition:background-color .15s}
+.bmines i:hover{background:#f4f2fa}
+.bmines i.op{background:var(--s1);cursor:default}
+.bmines i.fl .ms{color:#d94a4a;font-size:24px}
+.bmines i.mine{background:#f6d9d9}.bmines i.mine .ms{color:#2d2840;font-size:24px}.bmines i.boom{background:#e88}
+.bmines .n1{color:#4f6fb8}.bmines .n2{color:#2f8f5a}.bmines .n3{color:#d94a4a}.bmines .n4{color:#5b3fa8}.bmines .n5{color:#a8563f}.bmines .n6{color:#2f8f8f}
+/* ---------- round 8 ---------- */
+.art.radioart{background:linear-gradient(135deg,#cddcf7,#b9c6ec 55%,#a9b4e6);flex-direction:column;gap:2px;color:#22304f}
+.ra-l{font:500 11px "Red Hat Text";letter-spacing:.08em;text-transform:uppercase;opacity:.7}
+.ra-f{font:400 44px/1.05 "Red Hat Display";letter-spacing:-.01em}
+.ra-n{font:500 15px "Red Hat Text"}
+.player.compact .art.radioart .ra-l,.player.compact .art.radioart .ra-n{display:none}
+.player.compact .art.radioart .ra-f{font-size:18px}
+/* calendar */
+.calw{display:flex;gap:16px;height:100%}
+.cal-main{flex:1;display:flex;flex-direction:column;gap:14px;min-width:0}
+.cal-body{flex:1;min-height:0}
+.cal-side{width:250px;display:flex;flex-direction:column;gap:12px;padding:20px}
+.cal-list{flex:1;overflow:auto;display:flex;flex-direction:column;gap:12px;scrollbar-width:none}
+.cal-li{display:flex;gap:10px;align-items:flex-start}.cal-li>i{width:10px;height:10px;border-radius:50%;margin-top:7px;flex:none}
+.cal-h{font:500 12px "Red Hat Text";letter-spacing:.06em;text-transform:uppercase;color:var(--t3);text-align:center}
+.cal-m{display:grid;grid-template-columns:repeat(7,1fr);grid-template-rows:20px repeat(6,1fr);gap:5px;height:100%}
+.cal-d{background:var(--s1);border-radius:10px;padding:5px 6px;display:flex;flex-direction:column;gap:2px;overflow:hidden;cursor:pointer;transition:background-color var(--dur-hover) var(--ease)}
+.cal-d:hover{background:var(--s2)}
+.cal-d b{font:500 14px "Red Hat Text";color:var(--t1)}
+.cal-d i{font:400 11px/1.3 "Red Hat Text";font-style:normal;color:var(--t1);border-radius:5px;padding:1px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cal-d small{font:400 11px "Red Hat Text";color:var(--t3)}
+.cal-d.out{opacity:.4}
+.cal-d.today b{background:var(--ink);color:#fff;border-radius:999px;padding:0 7px;align-self:flex-start}
+.cal-d.sel,.cal-wc.sel{box-shadow:inset 0 0 0 2px var(--route)}
+.cal-w{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;height:100%}
+.cal-wc{background:var(--s1);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px;cursor:pointer;overflow:hidden}
+.cal-wc>b{font:400 24px "Red Hat Display";color:var(--t1);text-align:center}
+.cal-wc.today>b{color:var(--route)}
+.cal-ev{border-radius:8px;padding:6px 7px;font:400 12px/1.3 "Red Hat Text";color:var(--t1);display:flex;flex-direction:column}
+.cal-ev .num{font-weight:500;font-size:11px;color:var(--t2)}
+.cal-y{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;height:100%}
+.cal-ym{background:var(--s1);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:4px;cursor:pointer}
+.cal-ym:hover{background:var(--s2)}
+.cal-yg{display:grid;grid-template-columns:repeat(7,1fr);gap:1px}
+.cal-yg i{font:400 9px/14px "Red Hat Text";font-style:normal;text-align:center;color:var(--t2);border-radius:4px}
+.cal-yg i.ev{background:var(--sel);color:var(--on-sel);font-weight:600}
+.cal-yg i.today{background:var(--ink);color:#fff}
+/* guard mode */
+.gm-orb{width:60px;height:60px;border-radius:50%;background:#9b95b5;display:flex;align-items:center;justify-content:center;flex:none;transition:background-color .3s}
+.gm-card.on .gm-orb{background:#d94a4a;box-shadow:0 0 0 8px rgba(217,74,74,.14);animation:gmpulse 2.4s ease-in-out infinite}
+@keyframes gmpulse{50%{box-shadow:0 0 0 14px rgba(217,74,74,.06)}}
+/* round 9: compact player keeps one tidy line per row, cover follows the track */
+.p-compact .pc-txt .h3,.p-compact .pc-txt .b2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.p-compact .cart.cov{background-size:cover;background-position:center;color:transparent}
+.p-compact .cart.radioart{background:linear-gradient(135deg,#cddcf7,#a9b4e6);display:flex;align-items:center;justify-content:center}
+.p-compact .cart.radioart .ra-f{font-size:17px;color:#22304f}
+.player .p-full .h3,.player .p-full .b2{overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.p-full .b2{-webkit-line-clamp:1!important}
+.status .chip[data-go]{cursor:pointer}
+.status .chip[data-go]:hover{background:var(--s2)}
+/* calendar: day view + new-event sheet */
+.calw{position:relative}
+.cal-dv{height:100%;overflow:auto;scrollbar-width:none;display:flex;flex-direction:column;gap:8px}
+.cal-ad{border-radius:10px;padding:8px 12px;font:500 14px "Red Hat Text";color:var(--t1)}
+.cal-tl{position:relative;flex:none;margin:10px 0 10px 58px}
+.cal-hr{position:absolute;left:0;right:0;border-top:1px solid var(--line)}
+.cal-hr span{position:absolute;left:-58px;top:-9px;font:400 12px "Red Hat Text";color:var(--t3)}
+.cal-blk{position:absolute;left:8px;right:8px;border-radius:10px;padding:6px 12px;display:flex;flex-direction:column;overflow:hidden}
+.cal-blk b{font:500 15px "Red Hat Text";color:var(--t1)}.cal-blk span{font:400 13px "Red Hat Text";color:var(--t2)}
+.cal-now{position:absolute;left:-6px;right:0;height:2px;background:#d94a4a}.cal-now::before{content:"";position:absolute;left:0;top:-4px;width:10px;height:10px;border-radius:50%;background:#d94a4a}
+.cal-sheetov{position:absolute;inset:-8px;z-index:20;background:rgba(31,28,41,.16);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s var(--ease);border-radius:var(--r-card)}
+.cal-sheetov.on{opacity:1;pointer-events:auto}
+.cal-sheet{width:640px;max-height:100%;display:flex;flex-direction:column;gap:14px;padding:24px 26px;box-shadow:0 20px 60px rgba(36,30,72,.18);transform:translateY(14px);transition:transform .4s var(--ease)}
+.cal-sheetov.on .cal-sheet{transform:none}
+.cal-in{height:52px;border-radius:14px;border:1px solid var(--line);background:var(--s2);padding:0 16px;font:400 18px "Red Hat Text";color:var(--t1);outline:none;width:100%;box-sizing:border-box}
+.cal-in:focus{border-color:var(--route);background:var(--s1)}
+.ce-grid{display:grid;grid-template-columns:90px 1fr;gap:10px 14px;align-items:center}
+.ce-step{gap:10px;align-items:center}.ce-step b{font:500 17px "Red Hat Text";color:var(--t1);min-width:120px;text-align:center}
+.ce-step .icb{width:40px;height:40px;background:var(--s2)}
+.ce-cat .chip2 i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+.btn.off{opacity:.4;pointer-events:none}
+/* new-event sheet v2: everything on a 4-column grid, nothing shrinks, fits the panel */
+.cal-sheetov{inset:0;padding:12px}
+.cal-sheet{width:min(860px,100%);max-height:none;gap:16px;padding:24px 28px}
+.cal-sheet>*{flex-shrink:0}
+.cal-sheet .cal-in{height:48px}
+.ce-sugg{display:flex;gap:8px;flex-wrap:nowrap}
+.ce-sugg .chip2{height:38px;padding:0 14px;font-size:14px}
+.ce-grid{display:grid;grid-template-columns:64px minmax(0,1fr) 64px minmax(0,1fr);gap:12px 16px;align-items:center}
+.ce-grid>.b2{color:var(--t2)}
+.ce-wide{grid-column:span 3}
+.ce-step{display:flex;align-items:center;justify-content:space-between;height:48px;background:var(--s2);border-radius:14px;padding:0 4px}
+.ce-step b{font:500 16px "Red Hat Text";color:var(--t1);min-width:0;text-align:center;flex:1}
+.ce-step .icb{width:40px;height:40px;background:var(--s1)}
+.ce-grid .segx{padding:4px;height:48px;box-sizing:border-box}
+.ce-grid .segx div{height:40px;font-size:14px}
+.ce-cat{display:flex;gap:8px}
+.ce-cat .chip2{height:44px;flex:1;justify-content:center}
+.ce-actions{display:grid;grid-template-columns:1fr 2fr;gap:12px}
+.ce-actions .btn{height:52px}
+/* ---------- Settings › Sound ---------- */
+.snd{flex:1;min-width:0;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-content:start;overflow:auto;scrollbar-width:none;max-height:100%;padding-bottom:8px}
+.snd .scard{gap:12px}
+.snd-vol{grid-row:span 2}
+.snd-wide{grid-column:span 2}
+.vrow{display:flex;align-items:center;gap:14px;min-height:56px}
+.vrow .sl{min-width:0}
+.vrow .val{width:52px;text-align:right;font:500 15px "Red Hat Text";color:var(--t1)}
+.snd-pv{width:40px;height:40px;background:var(--s2);flex:none}
+.eq-curve{width:100%;height:90px;background:var(--s2);border-radius:14px}
+.eq-p{transition:d .4s var(--ease)}
+.sf-pad{position:relative;width:170px;height:220px;border-radius:20px;background:var(--s2);touch-action:none;cursor:crosshair;flex:none}
+.sf-car{position:absolute;inset:14px 34px;border-radius:44px 44px 34px 34px;border:2px solid var(--line);background:var(--s1)}
+.sf-seat{position:absolute;width:26px;height:30px;margin:-15px 0 0 -13px;border-radius:8px;background:#dcd8e8}
+.sf-dot{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;background:var(--route);box-shadow:0 0 0 8px rgba(122,107,242,.18),0 4px 10px rgba(36,30,72,.2);transition:left .35s var(--ease),top .35s var(--ease)}
+.sf-pad:active .sf-dot{transition:none}
+.sf-focus>div{flex:1 1 40%}
+.snd{grid-template-columns:minmax(0,1fr)}
+.snd-vol{grid-row:auto}.snd-wide{grid-column:auto}
+.snd .segx>div{flex:1}
+/* Sound: category bar that jumps to each section */
+.snd{position:relative;gap:0}
+.snd-tabs{position:sticky;top:0;z-index:3;display:flex;gap:6px;padding:6px;margin-bottom:16px;background:var(--s1);border-radius:999px;box-shadow:0 6px 18px rgba(36,30,72,.06)}
+.snd-tabs div{flex:1;height:44px;border-radius:999px;display:flex;align-items:center;justify-content:center;font:400 15px "Red Hat Text";color:var(--t2);cursor:pointer;transition:background-color var(--dur-hover) var(--ease),color var(--dur-hover) var(--ease)}
+.snd-tabs div:hover{background:var(--s2)}
+.snd-tabs div.on{background:var(--sel);color:var(--on-sel);font-weight:500}
+.snd-sec{display:flex;flex-direction:column;gap:16px;margin-bottom:16px}
+/* frosted category bar: content scrolling under it blurs, a soft fade hints there is more beneath */
+.snd-tabs{background:rgba(255,255,255,.62);-webkit-backdrop-filter:blur(16px) saturate(1.4);backdrop-filter:blur(16px) saturate(1.4);border:1px solid rgba(255,255,255,.7);transition:box-shadow .3s var(--ease)}
+.snd-tabs::after{content:"";position:absolute;left:12px;right:12px;top:100%;height:18px;pointer-events:none;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);-webkit-mask:linear-gradient(#000,transparent);mask:linear-gradient(#000,transparent);opacity:0;transition:opacity .3s var(--ease)}
+.snd.scrolled .snd-tabs{box-shadow:0 10px 28px rgba(36,30,72,.12)}
+.snd.scrolled .snd-tabs::after{opacity:1}
+/* Sound v3: the bar sits above the scroll area (no overlap); cards blur and fade as they slide up beneath it */
+.snd-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:0;max-height:100%;min-height:0;position:relative}
+.snd-wrap .snd-tabs{position:relative;top:auto;margin:0;flex:none;background:var(--s1);-webkit-backdrop-filter:none;backdrop-filter:none;border:1px solid var(--line);box-shadow:none;z-index:3}
+.snd-wrap .snd-tabs::after{display:none}
+.snd-wrap .snd{flex:1;min-height:0;max-height:none;padding-top:14px;
+  -webkit-mask:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.25) 10px,#000 30px);mask:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.25) 10px,#000 30px)}
+.snd-wrap .snd-blur{position:absolute;left:0;right:0;top:56px;height:26px;z-index:2;pointer-events:none;-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);-webkit-mask:linear-gradient(#000,transparent);mask:linear-gradient(#000,transparent);opacity:0;transition:opacity .3s var(--ease)}
+.snd-wrap.scrolled .snd-blur{opacity:1}
+.snd-wrap.scrolled .snd-tabs{box-shadow:0 8px 22px rgba(36,30,72,.10)}
+/* people photos */
+.av{border-radius:50%;object-fit:cover;flex:none;display:inline-flex;align-items:center;justify-content:center;background:var(--s3);box-shadow:0 0 0 1px rgba(36,30,72,.06)}
+.av-i{background:linear-gradient(135deg,#e7e3fd,#cddcf7);color:#22304f;font-family:"Red Hat Display";font-weight:500}
+.call-av{display:flex}.call-av .av{box-shadow:0 0 0 6px rgba(255,255,255,.5),0 10px 30px rgba(36,30,72,.15)}
+.prof .av{margin-bottom:2px}.prof.on .av{box-shadow:0 0 0 3px var(--route)}
+.drv{border-radius:50%;cursor:pointer;opacity:.6;transition:opacity var(--dur-hover) var(--ease),transform var(--dur-press) var(--ease)}
+.drv .av{display:block}
+.drv:hover{opacity:.9}.drv:active{transform:scale(.94)}
+.drv.on{opacity:1}.drv.on .av{box-shadow:0 0 0 3px var(--sel),0 0 0 5px var(--route)}
+/* ---------- Sound field: LYRA cabin map ---------- */
+.sf-mapwrap{width:300px;flex:none;background:var(--s2);border-radius:20px;padding:10px}
+.sf-map{width:100%;height:auto;display:block;touch-action:none;cursor:crosshair;user-select:none}
+.sf-body{fill:#fbfaff;stroke:#cfcbdc;stroke-width:2}
+.sf-glass{fill:#e4e1ee}
+.sf-dash{fill:#e4e1ee}.sf-console{fill:#ece9f4}
+.sf-front{font:600 10px "Red Hat Text";letter-spacing:.14em;fill:#a9a4bb}
+.sf-seat2{fill:#e7e3f2;stroke:#d5d0e3}.sf-head{fill:#dcd7ea}
+.sf-priv{fill:none;stroke:#7a6bf2;stroke-width:2;stroke-dasharray:5 5;opacity:0;transition:opacity .3s}
+.sf-seatg.priv .sf-priv{opacity:1}.sf-seatg.priv .sf-head{fill:#cbc2fa}
+.sf-stage{fill:none;stroke:#7a6bf2;stroke-width:8;stroke-linecap:round;opacity:0;transition:opacity .4s}
+.sf-area{transition:rx .3s var(--ease),ry .3s var(--ease),cx .25s var(--ease),cy .25s var(--ease)}
+.sf-rays line{stroke:#7a6bf2;stroke-width:1.2}
+.spk{--o:.5;--r:1}
+.spk>circle:first-child,.spk>rect{fill:#7a6bf2;opacity:var(--o);transition:opacity .25s}
+.spk-ring{fill:none;stroke:#7a6bf2;stroke-width:1.5;opacity:calc(var(--o) * .45);transform:scale(var(--r));transition:transform .25s,opacity .25s}
+.spk-roof>circle:first-child{fill:#4f8fd8}.spk-roof .spk-ring{stroke:#4f8fd8}
+.spk-head>circle:first-child{fill:#c26ab3;r:5}.spk-head .spk-ring{stroke:#c26ab3;r:9}
+.spk-sub>rect{fill:#2d2840}.spk-sub .spk-ring{stroke:#2d2840;r:16}
+.sf-spot{transition:transform .25s var(--ease);cursor:grab}
+.sf-map:active .sf-spot,.sf-map:active .sf-area{transition:none}
+.sf-spot-o{fill:rgba(122,107,242,.18);stroke:#7a6bf2;stroke-width:2}.sf-spot-i{fill:#7a6bf2}
+.sf-zones{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.sf-zones>div{height:56px;border-radius:14px;background:var(--s2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:400 13px "Red Hat Text";color:var(--t2);cursor:pointer;transition:background-color var(--dur-hover) var(--ease)}
+.sf-zones>div:hover{background:var(--s3)}.sf-zones>div.on{background:var(--sel);color:var(--on-sel)}
+.sf-sys{margin-top:auto}
+.sf-legend{gap:12px;flex-wrap:wrap;font:400 12px "Red Hat Text";color:var(--t2)}
+.sf-legend span{display:flex;align-items:center;gap:6px}
+.lg{width:10px;height:10px;border-radius:50%;display:inline-block}
+.lg-sur{background:#7a6bf2}.lg-roof{background:#4f8fd8}.lg-head{background:#c26ab3}.lg-sub{background:#2d2840;border-radius:3px}
+.atmos-badge{display:flex;align-items:center;gap:8px;border-radius:999px;padding:6px 12px;background:#2d2840;color:#fff;font:400 12px "Red Hat Text"}
+.atmos-badge b{font:600 13px "Red Hat Text";letter-spacing:.02em}
+.atmos-badge .ab-s{opacity:.7}
+.atmos-badge[data-mode="dirac"]{background:var(--sel);color:var(--on-sel)}
+.atmos-badge[data-mode="stereo"]{background:var(--s2);color:var(--t2)}
+.privgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.privc{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:var(--s2);cursor:pointer;transition:background-color var(--dur-hover) var(--ease)}
+.privc.on{background:#efeafe}
+.privc .tog{pointer-events:none}
+.anc{display:flex;align-items:flex-end;gap:16px;padding:12px 14px;background:var(--s2);border-radius:14px}
+.anc-bars{flex:1;height:48px;display:flex;align-items:flex-end;gap:3px}
+.anc-bars i{flex:1;background:linear-gradient(#b3a2f4,#7a6bf2);border-radius:3px;height:30%;transition:height .6s var(--ease)}
+.anc-db{font:500 20px "Red Hat Display";color:var(--t1)}
+/* ---------- 6-band equaliser ---------- */
+.eq-pre{display:flex;flex-wrap:wrap;gap:8px}
+.eq-pre>div{height:40px;padding:0 16px;border-radius:999px;background:var(--s2);display:flex;align-items:center;font:400 14px "Red Hat Text";color:var(--t2);cursor:pointer;transition:background-color var(--dur-hover) var(--ease),color var(--dur-hover) var(--ease)}
+.eq-pre>div:hover{background:var(--s3)}
+.eq-pre>div.on{background:var(--sel);color:var(--on-sel);font-weight:500}
+.eq6{position:relative;height:270px;background:var(--s2);border-radius:18px;padding:14px 16px 10px 56px}
+.eq-curve6{position:absolute;left:56px;right:16px;top:40px;height:180px;width:calc(100% - 72px);pointer-events:none}
+.eq-line{fill:none;stroke:var(--route);stroke-width:3;stroke-linecap:round;vector-effect:non-scaling-stroke;transition:d .35s var(--ease)}
+.eq-fill{fill:rgba(122,107,242,.12);transition:d .35s var(--ease)}
+.eq-grid{position:absolute;left:0;right:16px;top:40px;height:180px;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none}
+.eq-grid span{font:400 11px "Red Hat Text";color:var(--t3);border-bottom:1px dashed var(--line);padding-left:12px;line-height:0;height:0;display:block}
+.eq-grid span:nth-child(3){color:var(--t2)}
+.eq-bands{position:relative;display:grid;grid-template-columns:repeat(6,1fr);height:100%}
+.eqb{--p:50%;display:flex;flex-direction:column;align-items:center;gap:6px;cursor:ns-resize;touch-action:none;user-select:none}
+.eqv{height:20px;font:500 13px "Red Hat Text";color:var(--t2)}
+.eqb.up .eqv,.eqb.dn .eqv{color:var(--route)}
+.eqt{position:relative;width:6px;height:180px;border-radius:3px;background:rgba(45,40,64,.12)}
+.eqk{position:absolute;left:50%;top:var(--p);width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px var(--route),0 4px 12px rgba(36,30,72,.2);transition:top .35s var(--ease),transform var(--dur-press) var(--ease)}
+.eqb.drag .eqk{transition:none;transform:scale(1.12)}
+.eqf{font:500 13px "Red Hat Text";color:var(--t1);margin-top:auto}
+.eqk{width:18px;height:18px;margin:-9px 0 0 -9px;box-shadow:0 0 0 2px var(--route),0 2px 6px rgba(36,30,72,.18)}
+.eqb.drag .eqk{transform:scale(1.2)}
+.eqt{width:4px}
+/* album covers */
+.art.cov,.ph.cov{background-size:cover;background-position:center;color:transparent;border:0}
+.pk-cv{width:40px;height:40px;border-radius:8px;flex:none;background:var(--s2) center/cover}
+/* Media screen: battery card steps aside so the cover art can grow */
+.ctx .carstat{max-height:140px;overflow:hidden;transition:max-height .5s var(--ease),opacity .3s var(--ease),padding .5s var(--ease),margin .5s var(--ease),border-width .5s var(--ease)}
+.frame[data-scr="media"] .ctx .carstat{max-height:0;opacity:0;padding-top:0;padding-bottom:0;margin-top:-16px;border-width:0}
+/* ---------- Free drive + "Where to?" ---------- */
+.tcard,.tripbar,.cv-chip{transition:opacity .35s var(--ease),transform .35s var(--ease)}
+.app.noroute .tcard,.app.noroute .tripbar,.app.noroute .cv-chip{opacity:0;transform:translateY(-8px);pointer-events:none}
+.app.noroute .tripbar{transform:translateY(8px)}
+.app .nm-world svg:last-child,.app .nm-pin{transition:opacity .4s var(--ease)}
+.app.noroute .nm-world svg:last-child,.app.noroute .nm-pin{opacity:0}
+.endbtn{cursor:pointer;transition:background-color var(--dur-hover) var(--ease),transform var(--dur-press) var(--ease)}
+.endbtn:hover{background:var(--s3)!important}.endbtn:active{transform:scale(.97)}
+.wt{position:absolute;left:20px;top:20px;width:452px;z-index:6;opacity:0;pointer-events:none;transform:translateY(-8px);transition:opacity .35s var(--ease),transform .35s var(--ease)}
+.app.noroute .wt,.app.wt-open .wt{opacity:1;pointer-events:auto;transform:none}
+.wt-card{position:relative!important;left:auto!important;top:auto!important;padding:14px;display:flex;flex-direction:column;gap:12px;max-height:calc(var(--appH, 640px) - 40px)}
+.wt-bar{display:flex;align-items:center;gap:10px;height:56px;padding:0 6px 0 16px;border-radius:16px;background:var(--s2);cursor:text}
+.wt-q{flex:1;font:400 18px "Red Hat Text";color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wt-q.typed{color:var(--t1)}
+.app.wt-listen .wt-q{color:var(--route);animation:blinkdot 1.2s ease-in-out infinite}
+.wt-bar .icb{width:44px;height:44px;background:var(--s1)}
+.wt-mic .ms{color:var(--route)}
+.wt-x{display:none!important}
+.app.wt-open .wt-x{display:flex!important}
+.wt-quick{display:flex;gap:8px}.wt-quick .chip2{flex:1;justify-content:center;height:44px}
+.app.wt-open .wt-quick{display:none}
+.wt-body{display:none;flex-direction:column;gap:12px;min-height:0;overflow:hidden}
+.app.wt-open .wt-body{display:flex}
+.wt-cats{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.wt-cat{height:62px;border-radius:14px;background:var(--s2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:400 13px "Red Hat Text";color:var(--t2);cursor:pointer;transition:background-color var(--dur-hover) var(--ease)}
+.wt-cat .ms{font-size:22px;color:var(--t1)}
+.wt-cat:hover{background:var(--s3)}.wt-cat.on{background:var(--sel);color:var(--on-sel)}.wt-cat.on .ms{color:var(--on-sel)}
+.wt-list{overflow:auto;scrollbar-width:none;display:flex;flex-direction:column;gap:2px;max-height:380px}
+.wt-row{display:flex;align-items:center;gap:12px;min-height:58px;padding:4px 8px;border-radius:12px;cursor:pointer;transition:background-color var(--dur-hover) var(--ease)}
+.wt-row:hover{background:var(--s2)}
+.wt-ic{width:40px;height:40px;border-radius:12px;background:var(--route-soft,#ebe6fb);display:flex;align-items:center;justify-content:center;flex:none}
+.wt-ic .ms{font-size:22px;color:var(--route)}
+.wt-ic.big{width:56px;height:56px;border-radius:16px}.wt-ic.big .ms{font-size:30px}
+.wt-prev{display:none;flex-direction:column;gap:14px}
+.app.wt-preview .wt-prev{display:flex}
+.app.wt-preview .wt-cats,.app.wt-preview .wt-list{display:none}
+.wt-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.wt-stats>div{background:var(--s2);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+.wt-stats b{font:500 22px "Red Hat Display";color:var(--t1)}
+.wt-keys{display:none;flex-direction:column;gap:6px;padding-top:4px}
+.app.wt-kbon .wt-keys{display:flex}
+.app.wt-kbon .wt-cats{display:none}
+.app.wt-kbon .wt-list{max-height:170px}
+.wt-kr{display:flex;gap:5px;justify-content:center}
+.wt-k{flex:0 0 36px;height:44px;border-radius:10px;background:var(--s2);display:flex;align-items:center;justify-content:center;font:400 17px "Red Hat Text";color:var(--t1);cursor:pointer;user-select:none;transition:background-color var(--dur-hover) var(--ease),transform var(--dur-press) var(--ease)}
+.wt-k:hover{background:var(--s3)}.wt-k:active{transform:scale(.94)}
+.wt-k.wide{flex:0 0 72px}.wt-k.space{flex:1 1 auto;font-size:14px;color:var(--t2)}
+.wt-k.go{background:var(--ink);color:#fff;font-size:15px}
+.app.v-serene .wt-quick{display:none}
+.utoast{position:absolute;left:50%;bottom:150px;z-index:70;display:flex;align-items:center;gap:18px;transform:translate(-50%,12px);background:var(--ink);color:#fff;font:400 16px "Red Hat Text";border-radius:999px;padding:10px 12px 10px 22px;opacity:0;pointer-events:none;transition:opacity .3s var(--ease),transform .3s var(--ease)}
+.utoast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.utoast b{background:var(--sel);color:var(--on-sel);font-weight:500;border-radius:999px;padding:8px 16px;cursor:pointer}
+/* left column stacks with even 16 px gaps (positions set by hmi.js) */
+.app .seg[data-views],.app .carview .cv-chip,.app .carview .tl-chip{transition:top .4s var(--ease),opacity .3s var(--ease)}
+.app.wt-cover .seg[data-views],.app.wt-cover .carview .cv-chip,.app.wt-cover .carview .tl-chip{opacity:0;pointer-events:none}
+.wt{top:20px}
+.wt-card{padding:12px}
+.wt-bar{height:52px}
+.wt-quick{gap:8px}.wt-quick .chip2{height:42px}
+/* smoother left-column motion: one panel curve for every box (600 ms, standard ease) */
+.app .seg[data-views],.app .carview .cv-chip,.app .carview .tl-chip{transition:top .6s cubic-bezier(.2,.8,.2,1),opacity .45s cubic-bezier(.2,.8,.2,1),transform .6s cubic-bezier(.2,.8,.2,1);will-change:top}
+.tcard,.tripbar,.wt{transition:opacity .45s cubic-bezier(.2,.8,.2,1),transform .6s cubic-bezier(.2,.8,.2,1)}
+.app.noroute .tcard{transform:translateY(-6px) scale(.98);transform-origin:top left}
+.wt{transform:translateY(-6px) scale(.98);transform-origin:top left}
+.app.noroute .wt,.app.wt-open .wt{transform:none}
+.app.noroute .carview .cv-chip{transform:translateX(-10px)}
+/* Where-to card: height glides, contents fade in, view switch always stays */
+.app.wt-cover .seg[data-views]{opacity:1;pointer-events:auto}
+.wt-card{overflow:hidden;transition:height .6s cubic-bezier(.2,.8,.2,1)}
+.wt-body{flex:1 1 auto}
+.wt-list{flex:1 1 auto;min-height:0;max-height:none}
+.app.wt-kbon .wt-list{max-height:none;flex:1 1 0;min-height:96px}
+@keyframes wtIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.app.wt-open .wt-body,.app.wt-preview .wt-prev,.app.wt-kbon .wt-keys,.wt-list>*{animation:wtIn .45s cubic-bezier(.2,.8,.2,1) both}
+.wt-quick{animation:wtIn .45s cubic-bezier(.2,.8,.2,1) both}
+/* search bar: fixed height, buttons inset 6 px on every side */
+.wt-bar{flex:none;height:52px;box-sizing:border-box;padding:0 6px 0 16px;gap:8px}
+.wt-bar>.ms{margin-right:2px}
+.wt-bar .icb{width:40px;height:40px;flex:none;border-radius:12px}
+.wt-bar .icb .ms{font-size:22px}
+.wt-quick,.wt-cats{flex:none}
+/* ---------- Seats ---------- */
+.st-wrap{flex:1;min-width:0;display:flex;min-height:0;max-height:100%}
+.st{flex:1;min-width:0;display:flex;flex-direction:column;gap:16px;overflow:auto;scrollbar-width:none;padding-bottom:8px}
+.st .scard{gap:12px;flex:none}
+.st-pickwrap{width:220px;flex:none;background:var(--s2);border-radius:20px;padding:8px}
+.st-pick{width:100%;display:block}
+.st-body{fill:#fbfaff;stroke:#cfcbdc;stroke-width:2}.st-console{fill:#ece9f4}
+.st-front{font:600 10px "Red Hat Text";letter-spacing:.14em;fill:#a9a4bb}
+.st-seat{cursor:pointer}
+.st-cush{fill:#e7e3f2;stroke:#d5d0e3;stroke-width:1.5;transition:fill .3s var(--ease),stroke .3s var(--ease)}
+.st-hr{fill:#dcd7ea;transition:fill .3s var(--ease)}
+.st-seat:hover .st-cush{fill:#ddd8ee}
+.st-seat.on .st-cush{fill:var(--sel);stroke:#7a6bf2;stroke-width:2.5}.st-seat.on .st-hr{fill:#b9c6ec}
+.st-lbl{font:500 11px "Red Hat Text";fill:var(--t2)}
+.st-badges circle{fill:#d5d0e3;transition:fill .3s}
+.st-badges .b-heat.lit{fill:#e08a4a}.st-badges .b-vent.lit{fill:#4f8fd8}.st-badges .b-mass.lit{fill:#7a6bf2}
+.st-modes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.st-mode{border-radius:14px;background:var(--s2);padding:10px 12px;display:grid;grid-template-columns:28px 1fr;grid-template-rows:auto auto;column-gap:8px;align-items:center;cursor:pointer;transition:background-color var(--dur-hover) var(--ease),transform var(--dur-press) var(--ease)}
+.st-mode .ms{grid-row:span 2;color:var(--route)}
+.st-mode b{font:500 15px "Red Hat Text";color:var(--t1)}.st-mode .bs{font-size:12px}
+.st-mode:hover{background:var(--s3)}.st-mode:active{transform:scale(.98)}
+.st-mode.on{background:var(--sel)}
+.st-mem.on{background:var(--sel);color:var(--on-sel);border-color:var(--sel)}
+.st-sidewrap{width:250px;flex:none;background:var(--s2);border-radius:20px;padding:10px}
+.st-side{width:100%;display:block;overflow:visible}
+.st-floor{stroke:#cfcbdc;stroke-width:2;stroke-dasharray:6 6}
+.st-side rect{fill:#d8d2ec}
+.ss-back rect:first-child{fill:#c9c0ee}.ss-cush rect{fill:#c9c0ee}.ss-head rect{fill:#b3a6ef}.ss-lum{fill:#7a6bf2!important}.ss-leg rect{fill:#b3a6ef}.ss-rail{fill:#e2deee!important}
+.ss-all,.ss-back,.ss-cush,.ss-head,.ss-lum,.ss-leg{transition:transform .6s cubic-bezier(.2,.8,.2,1),opacity .4s var(--ease)}
+.ss-back{transform-origin:118px 140px}.ss-cush{transform-origin:120px 145px}.ss-leg{transform-origin:200px 158px}
+.st-rear{display:none!important}.st-isrear .st-rear{display:grid!important}
+.st-lock{color:#d94a4a}
+.st-masswrap{display:flex;flex-direction:column;align-items:center;gap:6px;width:170px;flex:none}
+.st-mass{width:130px;display:block}
+.sm-back{fill:#ece9f4;stroke:#d5d0e3;stroke-width:2}
+.st-mass .md{fill:#cfc8ec;transform-box:fill-box;transform-origin:center;transition:fill .3s}
+.st-mass.on .md{fill:#7a6bf2;animation:mpulse var(--dur,1.4s) ease-in-out infinite;animation-delay:calc(var(--i) * var(--dur,1.4s) / 16)}
+@keyframes mpulse{0%,100%{transform:scale(1);opacity:var(--amp,.7)}50%{transform:scale(1.55);opacity:1}}
+/* ---------- Seats v2: top view ---------- */
+.st-pickwrap{width:230px;padding:6px 4px;background:linear-gradient(180deg,var(--s2),#e9e6f1)}
+.tv-body{fill:url(#tvBody);stroke:#d4cfe2;stroke-width:1.5}
+.tv-mirror{fill:#e7e3f0;stroke:#d4cfe2}
+.tv-glass{fill:url(#tvGlass);opacity:.9}
+.tv-roof{fill:#f7f6fb;stroke:#ebe8f2}
+.tv-pillar{stroke:#e2deeb;stroke-width:3;stroke-linecap:round}
+.tv-bridge{fill:#e3ddd2;stroke:#d6cfc2}.tv-bridge-l{stroke:#d1c9ba;stroke-width:1;stroke-dasharray:3 5}
+.tv-front{font:600 9px "Red Hat Text";letter-spacing:.18em;fill:#aaa5bc}
+.tv-hit{fill:transparent}
+.tv-wheel ellipse{fill:none;stroke:#b8b2cc;stroke-width:3}.tv-wheel line{stroke:#b8b2cc;stroke-width:2}
+.tv-cush,.tv-back{fill:url(#tvSeat);stroke:#cdc7dc;stroke-width:1;transition:fill .35s var(--ease),stroke .35s var(--ease)}
+.tv-bol{fill:#d6d1e4;transition:fill .35s var(--ease)}.tv-head{fill:#d2cce2;transition:fill .35s var(--ease)}
+.st-seat:hover .tv-cush,.st-seat:hover .tv-back{stroke:#a99fd0}
+.st-seat.on .tv-cush,.st-seat.on .tv-back{fill:url(#tvSel);stroke:#7a6bf2;stroke-width:1.6}
+.st-seat.on .tv-bol,.st-seat.on .tv-head{fill:#a9b8ee}
+.st-seat.on .st-lbl{fill:var(--on-sel);font-weight:600}
+.st-lbl{font:500 10px "Red Hat Text";fill:var(--t2)}
+.st-badges circle{fill:#d8d3e6}
+/* ---------- Seats v2: adjustment view ---------- */
+.st-adj{display:grid;grid-template-columns:150px minmax(0,1fr) 150px;gap:14px;align-items:center}
+.st-modelist{display:flex;flex-direction:column;gap:6px}
+.st-am{border-radius:12px;padding:9px 12px;background:var(--s2);cursor:pointer;display:flex;flex-direction:column;transition:background-color var(--dur-hover) var(--ease)}
+.st-am b{font:500 14px "Red Hat Text";color:var(--t1)}.st-am span{font:400 11px "Red Hat Text";color:var(--t3)}
+.st-am:hover{background:var(--s3)}.st-am.on{background:var(--sel)}.st-am.on b{color:var(--on-sel)}
+.st-rear-only{display:none}.st-isrear .st-rear-only{display:flex}
+.st-sidewrap{width:auto;background:none;padding:0}
+.sv-panel{fill:#d9d4e6}.sv-panel-in{fill:#ece9f3;stroke:#fff;stroke-width:2}
+.sv-rail{fill:#c9c3dc}
+.sv-part path{fill:url(#svSeg);stroke:#b9b2cf;stroke-width:1.2;transition:fill .35s var(--ease),stroke .35s var(--ease)}
+.sv-part.act>path{fill:url(#svAct);stroke:#7a6bf2;stroke-width:1.6}
+.ss-lum{stroke:#7a6bf2;stroke-linecap:round;fill:none}
+.ss-back{transform-origin:118px 156px}.ss-cush{transform-origin:130px 165px}.ss-leg{transform-origin:245px 160px}
+.nd{cursor:pointer}
+.nd-c{fill:#fff;stroke:#7a6bf2;stroke-width:2;filter:drop-shadow(0 2px 4px rgba(36,30,72,.25))}
+.nd-d{fill:#7a6bf2}
+.nd.open .nd-c{fill:#7a6bf2}.nd.open .nd-d{fill:#fff}
+.nd-a circle{fill:#2d2840}.nd-a path{fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.nd-ai{animation:ndIn .3s cubic-bezier(.2,.8,.2,1) both;transform-box:fill-box;transform-origin:center}
+@keyframes ndIn{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+.nd-a:active circle{fill:#7a6bf2}
+.st-read{display:flex;flex-direction:column;gap:6px}
+.st-read>div{display:flex;flex-direction:column;border-radius:12px;padding:8px 12px;background:var(--s2);transition:background-color .3s var(--ease)}
+.st-read span{font:400 12px "Red Hat Text";color:var(--t2)}.st-read b{font:500 20px "Red Hat Display";color:var(--t1)}
+.st-read>div.on{background:var(--sel)}
+/* Seats v2 layout: modes row, big seat, readouts row */
+.st-adj{display:block}
+.st-sidewrap{width:100%;max-width:560px;margin:0 auto}
+.st-side{width:100%;height:auto}
+.st-modes2>div{flex:1}
+.st-read{flex-direction:row;gap:8px}
+.st-read>div{flex:1}
+.ss-back{transform-origin:118px 164px}.ss-cush{transform-origin:136px 168px}.ss-leg{transform-origin:256px 170px}
+/* Seats v3: soft-shaded modern seat, arrows always visible */
+.sv-panel-in{fill:#f1eff7;stroke:none}
+.sv-rail{fill:#d4cfe2}.sv-ped{fill:#e3dfee;stroke:#d0cadf;stroke-width:1}
+.sv-part>path:first-child{fill:url(#svSeg);stroke:#c7c0da;stroke-width:1;transition:fill .35s var(--ease),stroke .35s var(--ease)}
+.ss-back>path:first-child{fill:url(#svSegB)}
+.sv-st{fill:none;stroke:#d6d0e6;stroke-width:1.2;stroke-dasharray:2 3;stroke-linecap:round}
+.ss-lum{fill:none;stroke:#b3a6ef;stroke-linecap:round}
+.sv-part.act>path:first-child{fill:url(#svAct);stroke:#9d8ff4}
+.sv-part.act .sv-st{stroke:#b7c6f2}
+.nd-ai circle{fill:#fff;stroke:#d8d2e8;stroke-width:1;filter:drop-shadow(0 2px 4px rgba(36,30,72,.14))}
+.nd-ai path{fill:none;stroke:#6a5be0;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.nd-a{cursor:pointer}
+.nd-a:hover .nd-ai circle{fill:#f4f2fd}
+.nd-a:active .nd-ai circle{fill:#7a6bf2;stroke:#7a6bf2}.nd-a:active .nd-ai path{stroke:#fff}
+.nd-ai{animation:ndIn .35s cubic-bezier(.2,.8,.2,1) both}
+.ss-back{transform-origin:116px 160px}.ss-cush{transform-origin:134px 168px}.ss-leg{transform-origin:256px 170px}
+.st-sidewrap,.st-sidewrap svg{background:none!important}
+.st-side .sv-panel-in{fill:#f4f2f9!important}
+.ss-leg{transform-origin:256px 163px}
+/* Seats v4: ET9 cream Nappa, quilted centre panels, pillow headrest, graphite base */
+.sv-floor{fill:#e4e0ec}
+.sv-part>path:first-child{fill:url(#svSeg);stroke:#d3c9ba;stroke-width:1}
+.ss-back>path:first-child{fill:url(#svSegB)}
+.sv-q{fill:url(#quilt);stroke:none;opacity:.9}
+.sv-part.act>path:first-child{fill:url(#svAct);stroke:#9d8ff4}
+.sv-part.act .sv-q{fill:url(#quiltA)}
+.sv-st{stroke:#d8cfc1}
+.ss-lum{stroke:#b3a6ef;stroke-width:4}
+.ss-back{transform-origin:116px 164px}.ss-cush{transform-origin:132px 170px}.ss-leg{transform-origin:252px 162px}
+.tv-cush,.tv-back{stroke:#d6ccbd}
+.tv-bol{fill:#e2dace}.tv-head{fill:#ece5da;stroke:#d6ccbd;stroke-width:.8}
+.tv-q{fill:url(#tvQuilt)}
+.st-seat.on .tv-q{fill:url(#tvQuiltA)}
+.st-seat.on .tv-head{fill:#c8d4f6;stroke:#7a6bf2}
+/* Seats v5: flowing sculpted seat, orbit guides, live angle */
+.sv-panel-in{fill:#f6f5fa!important}
+.sv-orbit circle,.sv-orbit path{fill:none;stroke:#d9d4e6;stroke-width:.8}
+.sv-orbit .o2{stroke-dasharray:1 5;stroke-linecap:round}
+.sv-orbit .o3{stroke:#bfb6e0;stroke-width:1}
+.sv-part>path:first-child{fill:url(#svSeg);stroke:#d5cfe2;stroke-width:.8}
+.ss-back>path:first-child{fill:url(#svSegB)}
+.sv-band{fill:none;stroke:#3b3747;stroke-width:3.2;stroke-linecap:round}
+.sv-key{fill:#3b3747;opacity:.85}
+.sv-dark>path:first-child{fill:url(#svDark)!important;stroke:#2a2733!important}
+.sv-part.act>path:first-child{fill:url(#svAct);stroke:#9d8ff4}
+.sv-part.act .sv-band{stroke:#6a5be0}
+.sv-dark.act>path:first-child{fill:#6a5be0!important;stroke:#5246c8!important}
+.ss-lum{stroke:#c9c0f2;stroke-width:3}
+.sv-ann .ann-v{stroke:#cfc9de;stroke-width:.8;stroke-dasharray:2 4}
+.sv-ann .ann-r{stroke:#9d8ff4;stroke-width:.8}
+.sv-ann .ann-arc{fill:none;stroke:#7a6bf2;stroke-width:1.4;transition:d .6s cubic-bezier(.2,.8,.2,1)}
+.ann-t{font:300 20px "Red Hat Display";fill:var(--t1)}
+.ann-s{font:500 8px "Red Hat Text";letter-spacing:.16em;fill:var(--t3)}
+.ss-back{transform-origin:116px 160px}.ss-cush{transform-origin:132px 170px}.ss-leg{transform-origin:250px 162px}
+.sv-ann .ann-tick{stroke:#7a6bf2;stroke-width:1.4}
+/* Seats v6: thin shell seat, values next to every arrow pair */
+.sv-stalk{stroke:#2a2733;stroke-width:3;stroke-linecap:round;fill:none}
+.sv-part>path:first-child{stroke:#cfc9dc;stroke-width:.8}
+.ss-lum{stroke:#c9c0f2;stroke-width:2.5}
+.nd-v{font:500 12px "Red Hat Text";fill:var(--t2);pointer-events:none}
+.ann-t{font:300 26px "Red Hat Display"}
+.ss-back{transform-origin:116px 162px}.ss-cush{transform-origin:118px 166px}.ss-leg{transform-origin:256px 158px}
+.ann-s{letter-spacing:.1em}
+/* Seats v7: from Adi's sketch */
+.ss-cush>path:first-child{fill:url(#svBase)!important}
+.ss-cush.act>path:first-child{fill:url(#svAct)!important}
+.sv-slot{fill:#ffffff;stroke:#c9c0f2;stroke-width:1.2}
+.sv-part.act .sv-slot{stroke:#7a6bf2;fill:#eef1fd}
+.ss-lum{stroke-width:1.2!important}
+.ss-ext{stroke:#7a6bf2;stroke-width:3;stroke-linecap:round;opacity:.8}
+.st-nodriver{display:flex}.st-isdriver .st-nodriver{display:none!important}
+.ss-back{transform-origin:96px 180px}.ss-cush{transform-origin:103px 193px}.ss-leg{transform-origin:232px 173px}
+.ss-head{transform-origin:75px 40px}
+/* Seats v8: Adi's render, split into parts; Render / Silhouette */
+.st-side image{transition:opacity .4s var(--ease),filter .4s var(--ease)}
+.st-side .simg{opacity:0}
+.sv-sil .st-side .simg{opacity:1}.sv-sil .st-side .rimg{opacity:0}
+.st-side .sv-part.act>image{filter:drop-shadow(0 0 1.5px rgba(122,107,242,1)) drop-shadow(0 0 6px rgba(122,107,242,.45))}
+.ss-back.act .ss-head:not(.act) image{filter:none}
+.ss-back{transform-origin:90px 169px}.ss-cush{transform-origin:115px 169px}.ss-leg{transform-origin:214px 152px}
+.ss-all{transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.sv-floor{fill:#e2deeb}
+/* Seats v9: two-tone silhouette traced from Adi's render; steppers under the drawing */
+.st-side .sv-lt{fill:#ECE9F4;stroke:#d6d1e3;stroke-width:.8;transition:fill .35s var(--ease),stroke .35s var(--ease)}
+.st-side .sv-dk{fill:#3A3647;transition:fill .35s var(--ease)}
+.st-side .sv-part.act>.sv-lt{fill:#d7e0f8;stroke:#7a6bf2;stroke-width:1.4}
+.st-side .sv-part.act>.sv-dk,.st-side .ss-head.act .sv-dk{fill:#5a4fc8}
+.st-side .ss-back.act .ss-head:not(.act) .sv-dk{fill:#3A3647}
+.st-read{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.stp{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:14px;background:var(--s2);transition:background-color .3s var(--ease)}
+.stp.on{background:var(--sel)}
+.stp-l{font:400 12px "Red Hat Text";color:var(--t2)}
+.stp-c{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.stp-v{font:500 18px "Red Hat Display";color:var(--t1)}
+.stp-b{width:36px;height:36px;border-radius:10px;background:var(--s1);display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;transition:background-color var(--dur-hover) var(--ease),transform var(--dur-press) var(--ease)}
+.stp-b .ms{font-size:20px;color:var(--t1)}
+.stp-b:hover{background:var(--s3)}.stp-b:active{transform:scale(.94);background:var(--sel)}
+/* two tones with real contrast on the light panel */
+.st-side .sv-panel-in{fill:#f6f5fa!important}
+.st-side .sv-lt{fill:#d9d4e6;stroke:#c9c3da;stroke-width:.6}
+.st-side .sv-part.act>.sv-lt{fill:#c3cff4;stroke:#7a6bf2;stroke-width:1.2}
+/* two-tone seat: override the older seat drawings' fills */
+.st-side .sv-part>path.sv-lt,.st-side path.sv-lt{fill:#d9d4e6!important;stroke:#c6c0d8!important;stroke-width:.6!important}
+.st-side .sv-part>path.sv-dk,.st-side path.sv-dk{fill:#3A3647!important;stroke:none!important}
+.st-side .sv-part.act>path.sv-lt{fill:#c3cff4!important;stroke:#7a6bf2!important;stroke-width:1.2!important}
+.st-side .sv-part.act>path.sv-dk{fill:#5a4fc8!important}
+/* Seats v10: Adi's four-part seat render */
+.st-side image{transition:filter .35s var(--ease)}
+.st-side .sv-part.act>image{filter:drop-shadow(0 0 1.5px rgba(122,107,242,1)) drop-shadow(0 0 7px rgba(122,107,242,.45))}
+.st-side .ss-back.act .ss-head:not(.act) image{filter:none}
+.ss-back{transform-origin:110px 180px}.ss-cush{transform-origin:95px 225px}.ss-leg{transform-origin:209px 222px}.ss-head{transform-origin:60px 40px}
+.ss-back,.ss-cush,.ss-leg,.ss-head{transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+/* steppers: drawn − and +, even spacing */
+.stp-c{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;gap:8px}
+.stp-v{text-align:center;font:500 18px "Red Hat Display";color:var(--t1)}
+.stp-b{width:40px;height:40px;border-radius:12px;background:var(--s1);box-shadow:0 1px 2px rgba(36,30,72,.08)}
+.stp-b svg{width:20px;height:20px}
+.stp-b path{fill:none;stroke:var(--t1);stroke-width:2;stroke-linecap:round}
+.stp-b:active path{stroke:var(--on-sel)}
+.stp{padding:12px 14px;gap:8px}
+.ss-leg{transform-origin:209px 222px}
+.ss-back{transform-origin:92px 183px}
+/* seat diagram: protractor ring, quieter readout, sentence case */
+.sv-orbit circle{fill:none;stroke:#cfc9de;stroke-width:.7}
+.sv-ticks line{stroke:#d6d1e4;stroke-width:.6}.sv-ticks .tk{stroke:#b9b2cf;stroke-width:.9}
+.sv-ann .ann-v{stroke:#c3bcd6;stroke-width:.8;stroke-dasharray:2 3}
+.sv-ann .ann-r{stroke:#7a6bf2;stroke-width:.9}
+.sv-ann .ann-arc{stroke:#7a6bf2;stroke-width:1.2;fill:none}
+.ann-n{fill:#fff;stroke:#7a6bf2;stroke-width:1.2}.ann-nv{stroke:#b9b2cf}
+.ann-p{fill:#7a6bf2}
+.ann-t{font:400 18px "Red Hat Display"!important;fill:var(--t1)}
+.ann-s{font:400 11px "Red Hat Text"!important;letter-spacing:0!important;text-transform:none;fill:var(--t2)}
+.stp-v{font:500 15px "Red Hat Text"!important}
+.stp-l{font:400 12px "Red Hat Text"}
+.sv-ann .ann-arc{stroke:#7a6bf2;stroke-width:2;stroke-linecap:round}
+.sv-ann .ann-v{stroke:#b9b2cf;stroke-dasharray:none;stroke-width:.8}
+.sv-ann .ann-r{stroke:#7a6bf2;stroke-width:.8}
+.ann-lb{font:500 11px "Red Hat Text";fill:#5a4fc8}
+/* seat card: lavender box spans the full width; lumbar/bolster outlines */
+.st-sidewrap{max-width:none!important;width:100%;margin:0;background:#f6f5fa!important;border-radius:20px;padding:10px 0}
+.st-side{display:block;width:auto!important;height:300px;max-width:100%;margin:0 auto}
+.bk-ov{opacity:0;transition:opacity .35s var(--ease);pointer-events:none}
+.bk-zone .bk-ov{opacity:1}
+.bk-ov>g{opacity:.45;transition:opacity .3s var(--ease)}.bk-ov>g.on{opacity:1}
+.ov-l{fill:none;stroke:#7a6bf2;stroke-width:1.1;stroke-dasharray:3 3;transition:transform .4s var(--ease)}
+.ov-a{fill:none;stroke:#7a6bf2;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.ov-t{font:500 9px "Red Hat Text";fill:#5a4fc8}
+.ov-bol .ov-l{transform:scaleX(calc(1 - var(--b,2px) / 40px))}
+/* bolsters: small front-view inset, wings close in */
+.bol-inset{opacity:0;transition:opacity .35s var(--ease);pointer-events:none}
+.bol-focus .bol-inset{opacity:1}
+.bi-bg{fill:#fff;stroke:#e2deeb}
+.bi-back{fill:#ece9f4;stroke:#c9c3da;stroke-width:1}
+.bi-w{fill:none;stroke:#7a6bf2;stroke-width:3;stroke-linecap:round}
+.bi-a{fill:none;stroke:#7a6bf2;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.bi-l,.bi-r{transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.bi-t{font:400 8px "Red Hat Text";fill:var(--t3)}
+/* one-touch cards */
+.st-mode{grid-template-columns:28px 1fr}
+.st-mode>.ms{grid-row:span 2;color:var(--route);font-size:24px}
+.st-mode.on{background:var(--sel)}.st-mode.on b,.st-mode.on .ms{color:var(--on-sel)}
+/* top view, matched to the new seat */
+.tv2-body{fill:#fbfaff;stroke:#cfc9de;stroke-width:1.2}
+.tv2-line{fill:none;stroke:#e1ddea;stroke-width:1}
+.tv2-mir{fill:#efedf5;stroke:#cfc9de;stroke-width:1}
+.tv2-con{fill:#efedf5;stroke:#e1ddea}
+.tv2-th,.tv2-cu,.tv2-bki{fill:#f3f1f7;stroke:#d6d1e4;stroke-width:.8;transition:fill .3s var(--ease),stroke .3s var(--ease)}
+.tv2-thl,.tv2-bk,.tv2-hr{fill:#3A3647;transition:fill .3s var(--ease)}
+.tv2-in{fill:#cfc8f2}
+.tv-wheel path,.tv-wheel line{fill:none;stroke:#b8b2cc;stroke-width:2.4;stroke-linecap:round}
+.st-seat.on>g{filter:drop-shadow(0 0 1.5px rgba(122,107,242,1)) drop-shadow(0 0 7px rgba(122,107,242,.4))}
+.st-seat.on .tv2-th,.st-seat.on .tv2-cu,.st-seat.on .tv2-bki{fill:#e3e9fb}
+.st-seat:hover:not(.on) .tv2-cu{stroke:#a99fd0}
+/* massage */
+.ms-progs{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.mp{border-radius:14px;background:var(--s2);padding:10px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;font:400 13px "Red Hat Text";color:var(--t2);transition:background-color var(--dur-hover) var(--ease)}
+.mp:hover{background:var(--s3)}.mp.on{background:var(--sel);color:var(--on-sel)}
+.mp-ic{width:34px;height:36px}.mp-bk{fill:#fff;stroke:#cfc9de}
+.mb{fill:#7a6bf2;opacity:.7}
+.mp.on .mb-wave,.mp:hover .mb-wave{animation:mbWave 2s ease-in-out infinite}
+.mp.on .mb-sh1,.mp:hover .mb-sh1,.mp.on .mb-sh2,.mp:hover .mb-sh2,.mp.on .mb-lo1,.mp:hover .mb-lo1,.mp.on .mb-lo2,.mp:hover .mb-lo2{animation:mbPulse 1.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+.mb-sh2,.mb-lo2{animation-delay:.6s!important}
+.mb-st{fill:#e08a4a}.mp.on .mb-st,.mp:hover .mb-st{animation:mbPulse 1.8s ease-in-out infinite;animation-delay:calc(var(--i) * .3s);transform-box:fill-box;transform-origin:center}
+.mp.on .mb-str,.mp:hover .mb-str{animation:mbStr 2s ease-in-out infinite}
+@keyframes mbWave{50%{transform:translateY(22px)}}
+@keyframes mbPulse{50%{transform:scale(1.5);opacity:1}}
+@keyframes mbStr{50%{transform:translateY(26px)}}
+.ms-body{display:flex;gap:22px;align-items:center}
+.ms-prev{width:150px;flex:none;display:flex;flex-direction:column;align-items:center;gap:6px}
+.ms-svg{width:120px;height:220px}
+.ms-back{fill:#f3f1f7;stroke:#cfc9de;stroke-width:1.2}
+.ms-z{fill:transparent;cursor:pointer}
+.ms-z:not(.sel){fill:rgba(243,241,247,.86)}
+.ms-div{stroke:#d6d1e4;stroke-dasharray:3 4}
+.ms-zt{font:500 10px "Red Hat Text";fill:var(--t3);text-anchor:middle;pointer-events:none}
+.ma{fill:#7a6bf2;opacity:var(--mop,.7);transform-box:fill-box;transform-origin:center}
+.ma-wave{animation:maWave var(--mdur,2s) ease-in-out infinite}
+.ma-sh1,.ma-sh2,.ma-lo1,.ma-lo2{animation:maPulse var(--mdur,2s) ease-in-out infinite}.ma-sh2,.ma-lo2{animation-delay:calc(var(--mdur,2s) / 2)}
+.ma-st{fill:#e08a4a;animation:maPulse var(--mdur,2s) ease-in-out infinite;animation-delay:calc(var(--i) * var(--mdur,2s) / 8)}
+.ma-str{animation:maStr var(--mdur,2s) ease-in-out infinite}
+@keyframes maWave{0%,100%{transform:translateY(0) scale(var(--mamp,1))}50%{transform:translateY(140px) scale(var(--mamp,1))}}
+@keyframes maPulse{0%,100%{transform:scale(calc(var(--mamp,1) * .7));opacity:calc(var(--mop,.7) * .5)}50%{transform:scale(calc(var(--mamp,1) * 1.25));opacity:var(--mop,.7)}}
+@keyframes maStr{0%,100%{transform:translateY(0) scaleX(var(--mamp,1))}50%{transform:translateY(176px) scaleX(var(--mamp,1))}}
+.ms-card.off .ma,.ms-card.off .mb{animation-play-state:paused!important;opacity:.15}
+
+/* ---------- Climate (HVAC) v74 ---------- */
+.ic-svg{width:26px;height:26px;display:block}
+.dock .dk.cmf{width:72px}
+.dock .dk.cmf .ic-svg{width:28px;height:28px}
+.dk.cmf .cmf-l{display:flex;align-items:center;gap:5px}
+.dk.cmf .lv{display:flex;gap:2px;align-items:flex-end}
+.dk.cmf .lv b{width:3px;height:8px;border-radius:2px;background:#e2895c;transition:background-color var(--dur-hover) var(--ease)}
+.dk.cmf .lv b:nth-child(2){height:10px}.dk.cmf .lv b:nth-child(3){height:12px}
+.dk.cmf .lv b.off{background:var(--s3)}
+.dk[data-cmf="defrost"].on{background:#fde6d8;color:#8a3d14}.dk[data-cmf="defrost"].on .ic-svg{color:#c4561c}
+.clim .t[data-go]{cursor:pointer;border-radius:12px;transition:background-color var(--dur-hover) var(--ease)}
+.clim .t[data-go]:hover{background:var(--s2)}
+
+.cl-pane{gap:16px;padding:16px}
+.cl-cab{width:300px;flex:none;display:flex;flex-direction:column;gap:10px;padding:16px 18px}
+.cz-wrap{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,var(--s2),#e9e6f1);border-radius:20px;padding:4px}
+.cz-svg{height:100%;max-height:440px;width:auto;display:block}
+.cl-cabrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 2px;cursor:pointer}
+.cl-cabrow .b2{font-size:15px}.cl-cabrow .bs{font-size:12px}
+.cz-tint{opacity:0;transition:opacity .6s var(--ease)}
+.cz-s0{stop-color:var(--zc,#cddcf7);stop-opacity:.85;transition:stop-color .6s var(--ease)}
+.cz-s1{stop-color:var(--zc,#cddcf7);stop-opacity:0;transition:stop-color .6s var(--ease)}
+.cz-flow path{fill:none;stroke:var(--zc,#9db6e8);stroke-width:2;stroke-linecap:round;stroke-dasharray:4 10;opacity:.75;animation:czf var(--fs,1.6s) linear infinite;animation-delay:var(--d);transition:stroke .6s var(--ease),opacity .6s var(--ease)}
+@keyframes czf{to{stroke-dashoffset:-28}}
+.cz-flow.off path{opacity:0}
+.cz-vents rect{fill:#dcd8e8}
+.cz-wind,.cz-rwind{fill:none;stroke:#e9a27b;stroke-width:3;stroke-linecap:round;stroke-dasharray:3 6;opacity:0;transition:opacity .6s var(--ease)}
+.cl-deff .cz-wind,.cl-defr .cz-rwind{opacity:1;animation:czf 1.2s linear infinite}
+.cz-pill rect{fill:#fff;stroke:#dcd8e8;stroke-width:1;transition:fill .3s var(--ease),stroke .3s var(--ease)}
+.cz-pill text{font:500 13px "Red Hat Display";fill:var(--t1)}
+.cz-seat.on .cz-pill rect{fill:var(--sel);stroke:#7a6bf2}
+.cz-seat.on .cz-pill text{fill:var(--on-sel)}
+.cz-lock{opacity:0;transform-box:fill-box;transition:opacity .3s var(--ease)}
+.cz-lock circle{fill:var(--ink)}.cz-lock path{fill:none;stroke:#fff;stroke-width:1.5;stroke-linejoin:round}
+.cl-locked .cz-lock{opacity:1}
+
+.cl-wrap{flex:1}
+.cl-wrap .snd-tabs div{font-size:14px}
+.cl-zone{gap:14px!important}
+.cl-heat{display:flex;align-items:center;gap:8px;font-size:13px}
+.cl-dot{width:8px;height:8px;border-radius:50%;background:#7fbf8e;box-shadow:0 0 0 4px rgba(127,191,142,.2)}
+.cl-big{display:grid;grid-template-columns:64px 1fr 64px;align-items:center;gap:12px}
+.cl-bb{width:64px;height:64px;border-radius:20px;background:var(--s2);display:flex;align-items:center;justify-content:center;color:var(--t1);cursor:pointer;user-select:none;transition:background-color var(--dur-hover) var(--ease),transform var(--dur-press) var(--ease)}
+.cl-bb:hover{background:var(--s3)}.cl-bb:active{transform:scale(.94);background:var(--sel)}
+.cl-tv{display:flex;align-items:flex-start;justify-content:center;gap:4px}
+.cl-t{font:300 72px/1 "Red Hat Display";color:var(--t1);letter-spacing:-.02em;transition:color .4s var(--ease)}
+.cl-u{font:400 20px "Red Hat Text";color:var(--t3);margin-top:8px}
+.cl-fanrow{display:flex;align-items:center;gap:14px}
+.cl-fl{display:flex;align-items:center;gap:8px;font:400 15px "Red Hat Text";color:var(--t2);width:72px}
+.cl-fan{flex:1;display:flex;align-items:flex-end;gap:6px;height:48px;padding:0 4px}
+.cl-fan i{flex:1;height:var(--h);border-radius:6px;background:var(--s3);cursor:pointer;transition:background-color var(--dur-hover) var(--ease),transform var(--dur-press) var(--ease)}
+.cl-fan i:hover{background:#cfcae0}
+.cl-fan i.on{background:#8ea7e6}
+.cl-fan.auto i.on{background:#b9c6ec}
+.cl-fan i:active{transform:scaleY(.92)}
+.cl-fv{width:56px;text-align:right;font:500 16px "Red Hat Text";color:var(--t1)}
+.cl-qrow{display:flex;gap:10px}
+.cl-q{height:92px;position:relative;text-align:center;padding:0 6px}
+.cl-q .ic-svg{color:var(--t1)}
+.cl-q.on .ic-svg{color:var(--on-sel)}
+.cl-qs{font:400 11px "Red Hat Text";font-style:normal;color:var(--t3);margin-top:-2px}
+.cl-q.on .cl-qs{color:var(--on-sel);opacity:.8}
+.cl-q[data-cl="maxh"].on,.cl-q[data-cl="deff"].on,.cl-q[data-cl="defr"].on{background:#fde6d8;border-color:#f6c9ad;color:#8a3d14}
+.cl-q[data-cl="maxh"].on .ms,.cl-q[data-cl="deff"].on .ic-svg,.cl-q[data-cl="defr"].on .ic-svg,.cl-q[data-cl="deff"].on .cl-qs,.cl-q[data-cl="defr"].on .cl-qs{color:#8a3d14}
+
+.cl-modes{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.cl-mode{height:104px;border-radius:18px;background:var(--s2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font:400 14px "Red Hat Text";color:var(--t2);cursor:pointer;transition:background-color var(--dur-hover) var(--ease),color var(--dur-hover) var(--ease),transform var(--dur-press) var(--ease)}
+.cl-mode:hover{background:var(--s3)}.cl-mode:active{transform:scale(.96)}
+.cl-mode.on{background:var(--sel);color:var(--on-sel);font-weight:500}
+.cl-mi{width:44px;height:44px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.cl-mi circle{fill:currentColor;stroke:none}
+.cl-vent{display:flex;gap:20px;align-items:center}
+.vent-pad{width:220px;height:150px;flex:none;border-radius:20px;background:linear-gradient(180deg,#f3f1f8,#e8e5f0);position:relative;overflow:hidden;touch-action:none;cursor:grab;border:1px solid var(--line)}
+.vent-pad:active{cursor:grabbing}
+.vp-grid{position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:36.6px 37.5px;background-position:center;opacity:.6}
+.vp-blades{position:absolute;inset:22px 30px;display:flex;flex-direction:column;justify-content:space-between}
+.vp-blades i{height:6px;border-radius:3px;background:#c9c3dc;transform:translateY(calc(var(--vy,0) * 5px)) rotate(calc(var(--vx,0) * 14deg)) scaleX(calc(1 - var(--vxa,0) * .12));transition:transform .4s var(--ease)}
+.vp-dot{position:absolute;left:calc(50% + var(--vx,0) * 80px - 14px);top:calc(50% + var(--vy,0) * 52px - 14px);width:28px;height:28px;border-radius:50%;background:var(--sel);border:3px solid #fff;box-shadow:0 2px 10px rgba(36,30,72,.25),0 0 0 10px rgba(122,107,242,.12);transition:left .3s var(--ease),top .3s var(--ease)}
+.vent-pad.drag .vp-dot,.vent-pad.drag .vp-blades i{transition:none}
+.vent-pad.sweep .vp-dot{animation:vsweep 4s var(--ease) infinite alternate}
+.vent-pad.sweep .vp-blades i{animation:vblade 4s var(--ease) infinite alternate}
+@keyframes vsweep{from{left:calc(50% - 94px)}to{left:calc(50% + 66px)}}
+@keyframes vblade{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
+.vent-pad.focus .vp-dot{box-shadow:0 2px 10px rgba(36,30,72,.25),0 0 0 4px rgba(122,107,242,.18)}
+.vent-pad.diffuse .vp-dot{box-shadow:0 2px 10px rgba(36,30,72,.25),0 0 0 18px rgba(122,107,242,.10)}
+
+.cl-aq{display:flex;gap:18px;align-items:center;padding:4px 0 6px}
+.aq-m{width:150px;position:relative;display:flex;flex-direction:column;align-items:center}
+.aq-m svg{width:150px;height:88px;display:block}
+.aq-tr,.aq-v{fill:none;stroke-width:10;stroke-linecap:round}
+.aq-tr{stroke:var(--s2)}
+.aq-v{stroke:#7fbf8e;stroke-dasharray:100;stroke-dashoffset:calc(100 - var(--p,20));transition:stroke-dashoffset 1s var(--ease),stroke .6s var(--ease)}
+.aq-m b{position:absolute;top:40px;font:400 34px "Red Hat Display";color:var(--t1)}
+.aq-m .bs{font-size:13px;margin-top:2px}
+.aq-note{flex:1;min-width:0}
+.cl-scents{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.cl-scent{border-radius:18px;background:var(--s2);padding:14px;display:flex;flex-direction:column;gap:3px;cursor:pointer;border:2px solid transparent;transition:background-color var(--dur-hover) var(--ease),border-color var(--dur-hover) var(--ease),transform var(--dur-press) var(--ease)}
+.cl-scent:hover{background:var(--s3)}.cl-scent:active{transform:scale(.97)}
+.cl-scent.on{background:var(--sel);border-color:#9fb2ea}
+.cl-scent b{font:500 15px "Red Hat Text";color:var(--t1)}.cl-scent .bs{font-size:13px}
+.sc-dot{width:26px;height:26px;border-radius:50%;margin-bottom:6px}
+.sc-forest{background:radial-gradient(circle at 35% 35%,#bfe0c4,#6f9e78)}.sc-sea{background:radial-gradient(circle at 35% 35%,#d4e6fb,#7ea4d6)}.sc-amber{background:radial-gradient(circle at 35% 35%,#f8dcb8,#c98d4f)}
+.sc-lv{height:5px;border-radius:3px;background:rgba(255,255,255,.7);margin-top:8px;overflow:hidden}.sc-lv i{display:block;height:100%;background:#8f8ba3;border-radius:3px}
+.cl-scent:nth-child(3) .sc-lv i{background:#d77a52}
+.cl-scents.off,.cl-frag-off{opacity:.45;pointer-events:none;transition:opacity .4s var(--ease)}
+.cl-ic{color:var(--t2);display:flex}
+.cl-pre{display:flex;gap:24px;align-items:flex-end}
+.cl-stp{display:grid;grid-template-columns:40px auto 40px;align-items:center;gap:10px}
+.cl-stp .stp-b{width:40px;height:40px;background:var(--s2);color:var(--t1)}
+.cl-sv{min-width:56px;text-align:center;font:500 20px "Red Hat Display";color:var(--t1)}
+.cl-stp.big .cl-sv{font-size:30px;font-weight:400;min-width:96px}
+.cl-days{display:flex;gap:6px}
+.cl-days span{flex:1;height:44px;border-radius:12px;background:var(--s2);display:flex;align-items:center;justify-content:center;font:500 15px "Red Hat Text";color:var(--t2);cursor:pointer;transition:background-color var(--dur-hover) var(--ease),color var(--dur-hover) var(--ease)}
+.cl-days span.on{background:var(--sel);color:var(--on-sel)}
+.cl-pre-off .cl-pre{opacity:.45;pointer-events:none}
+.cl-keep>div{flex:1;gap:8px}
+.cl-frrow{display:flex;gap:20px;align-items:center}
+.fr-box{width:150px;height:120px;flex:none;border-radius:20px;position:relative;overflow:hidden;background:linear-gradient(160deg,#e9f1fd,#cfdff7);transition:background .6s var(--ease)}
+.fr-box[data-frm="warm"]{background:linear-gradient(160deg,#fdf0e4,#f6d2b4)}
+.fr-box[data-frm="off"]{background:linear-gradient(160deg,#f3f1f7,#e3e0ec)}
+.fr-door{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1}
+.fr-t{font:300 44px/1 "Red Hat Display";color:var(--t1)}
+.fr-m{font:400 13px "Red Hat Text";color:var(--t2);margin-top:4px}
+.fr-frost{position:absolute;inset:0;background:radial-gradient(circle at 20% 20%,rgba(255,255,255,.9) 0 2px,transparent 3px),radial-gradient(circle at 70% 30%,rgba(255,255,255,.8) 0 1.5px,transparent 2.5px),radial-gradient(circle at 40% 80%,rgba(255,255,255,.8) 0 2px,transparent 3px);background-size:40px 40px;opacity:.8;animation:frost 6s linear infinite;transition:opacity .6s var(--ease)}
+.fr-box[data-frm="warm"] .fr-frost{opacity:0}.fr-box[data-frm="off"] .fr-frost{opacity:0}
+@keyframes frost{to{background-position:0 40px,0 40px,0 40px}}
+.cl-fridge.off .cl-frrow .col{opacity:.45;pointer-events:none}
+.cl-trayrow{display:flex;gap:18px;align-items:center}
+.tray-svg{width:120px;height:78px;flex:none;background:var(--s2);border-radius:16px}
+.tr-seat{fill:#e3e0ec;stroke:#cfc9de}.tr-arm{fill:#cfc9de}
+.tr-tab rect{fill:#8f8ba3}
+.tr-tab{transform-origin:40px 41px;transform:rotate(-90deg) scaleX(.36);transition:transform .6s var(--ease)}
+.tray-out .tr-tab{transform:none}
+.cl-hint{font-size:13px}
+/* bottom bar fits the three comfort buttons */
+.dock{padding:0 10px}
+.dock .dk{width:66px}.dock .dk.cmf{width:64px}
+.dock .dvol{padding:0 6px;gap:6px}.dock .dvol .sl{width:72px}
+.dock .clim{width:198px}.dock .clim .t{width:78px;font-size:30px}
+.dock .sep{margin:0 4px}
+.cl-wrap .row>.segx{flex:1}
+.cl-trayrow .btn{flex:none;white-space:nowrap}
+.cl-frrow .lab,.cl-frrow .bs{font-size:13px}
+
+/* ---------- v75: bottom bar regroup · fan dial · seat-side airflow ---------- */
+.dock .apps{gap:6px}
+.dock .dk{width:74px}
+.dock .dk.cmf{width:56px;position:relative;transition:width var(--dur-panel) var(--ease),background-color var(--dur-hover) var(--ease),color var(--dur-hover) var(--ease)}
+.dock .dk.cmf .ms{font-size:28px}
+.dock .dk.cmf .dk-l{max-height:0;opacity:0;overflow:hidden;transition:max-height var(--dur-panel) var(--ease),opacity var(--dur-hover) var(--ease)}
+.dock .dk.cmf.on{width:76px}
+.dock .dk.cmf.on .dk-l{max-height:18px;opacity:1}
+.dock .dk.cmf .lv{position:absolute;top:18px;right:8px}
+.dock .dk.cmf .lv b{width:3px}
+.dock .sep{margin:0 10px;height:40px}
+.dock .dvol{padding:0 10px;gap:10px}
+.dock .dvol .sl{width:168px}
+.dock .clim{width:190px}
+
+.cl-top{display:grid;grid-template-columns:minmax(0,1fr) 1px 196px;align-items:center;gap:18px}
+.cl-vsep{height:96px;background:var(--line)}
+.cl-big{grid-template-columns:56px 1fr 56px;gap:8px}
+.cl-bb{width:56px;height:56px;border-radius:18px}
+.cl-t{font-size:64px}
+.fd{position:relative;width:196px;touch-action:none;cursor:pointer;user-select:none}
+.fd svg{width:100%;display:block;overflow:visible}
+.fd-tr,.fd-v{fill:none;stroke-width:14;stroke-linecap:round}
+.fd-tr{stroke:var(--s2)}
+.fd-v{stroke:#8ea7e6;stroke-dasharray:100;stroke-dashoffset:calc(100 - var(--p,0));transition:stroke-dashoffset .4s var(--ease),stroke .4s var(--ease)}
+.fd.auto .fd-v{stroke:#b9c6ec}
+.fd.drag .fd-v,.fd.drag .fd-th{transition:none}
+.fd-tk{fill:#c9c3dc;transition:fill .3s var(--ease)}.fd-tk.on{fill:#fff}
+.fd-th{fill:#fff;stroke:#6f8fe0;stroke-width:3;filter:drop-shadow(0 2px 4px rgba(36,30,72,.25));transition:cx .4s var(--ease),cy .4s var(--ease)}
+.fd-fan{fill:#8ea7e6;animation:fdspin var(--fs,1.4s) linear infinite;transform-box:fill-box;transform-origin:center}
+.fd.auto .fd-fan{fill:#a9b8ee}
+.fd.off .fd-fan{animation:none;fill:var(--s3)}
+@keyframes fdspin{to{transform:rotate(360deg)}}
+.fd-tx{position:absolute;left:0;right:0;bottom:-2px;display:flex;align-items:baseline;justify-content:center;gap:6px}
+.fd-n{font:500 22px "Red Hat Display";color:var(--t1)}
+.fd-l{font:400 13px "Red Hat Text";color:var(--t3)}
+
+.cl-mi{width:76px;height:58px;fill:none;stroke:none}
+.mi-glass{stroke:#b9c6ec;stroke-width:3;stroke-linecap:round}
+.mi-dash,.mi-leg{fill:none;stroke:#cfc9de;stroke-width:2.5;stroke-linecap:round}
+.mi-floor{stroke:#e1ddea;stroke-width:1.5}
+.mi-seat{fill:#d6d1e4;transition:fill .3s var(--ease)}
+.mi-air{fill:none;stroke:#9fb2ea;stroke-width:2.6;stroke-linecap:round;stroke-dasharray:5 5;opacity:.75}
+.cl-mode.on .mi-seat{fill:#a9b8ee}
+.cl-mode.on .mi-air{stroke:#5f7fd8;opacity:1;animation:miair 1.1s linear infinite;animation-delay:var(--d)}
+.cl-mode.on .mi-glass{stroke:#8ea7e6}
+@keyframes miair{to{stroke-dashoffset:-20}}
+.dock .dvol>.ms{width:28px;overflow:hidden;flex:none}
+.dock .dk{width:68px}
+.dock .dvol .sl{width:150px}
+/* fan spins around its hub, not its bounding box */
+.fd-fan{transform-box:view-box;transform-origin:0 0}
+
+/* ---------- v77: airflow tiles (cabin glow + person + arrows) ---------- */
+.cl-mi{width:80px;height:62px}
+.mi-cab{fill:none;stroke:#d6d1e4;stroke-width:2;stroke-linecap:round}
+.mi-gl{fill:none;stroke:#c3cdee;stroke-width:3.5;stroke-linecap:round}
+.mi-p{fill:#a29db8;transition:fill .3s var(--ease)}
+.mi-g{fill:#a9bbef;opacity:.35;filter:blur(3px);transition:opacity .4s var(--ease),fill .4s var(--ease)}
+.mi-ar{fill:none;stroke:#8f8ba3;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;transition:stroke .3s var(--ease)}
+.cl-mode.on .mi-g{fill:#7f9be6;opacity:.6;animation:miglow 2.4s var(--ease) infinite alternate}
+.cl-mode.on .mi-ar{stroke:#4f6fc8}
+.cl-mode.on .mi-p{fill:var(--on-sel)}
+.cl-mode.on .mi-gl{stroke:#8ea7e6}
+@keyframes miglow{from{opacity:.35}to{opacity:.75}}
+
+/* ---------- seat warm–cool control ---------- */
+.wc{display:flex;flex-direction:column;gap:8px}
+.wc-h{display:flex;justify-content:space-between;align-items:baseline}
+.wc-st{font-size:13px}
+.wc[data-v="cool"] .wc-st{color:#3e5f9e}.wc[data-v="warm"] .wc-st{color:#a8532a}
+.wc-row{display:flex;align-items:center;gap:10px}
+.wc-ic{display:flex}.wc-ic .ms{font-size:22px}.wc-ic.c .ms{color:#6f8fd8}.wc-ic.w .ms{color:#d77a52}
+.wc-seg{flex:1;display:grid;grid-template-columns:repeat(3,1fr) 1.4fr repeat(3,1fr);gap:4px;padding:4px;background:var(--s2);border-radius:16px}
+.wc-seg i{height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font:500 15px "Red Hat Text";font-style:normal;color:var(--t3);cursor:pointer;user-select:none;transition:background-color var(--dur-hover) var(--ease),color var(--dur-hover) var(--ease),transform var(--dur-press) var(--ease)}
+.wc-seg i:hover{background:var(--s3)}.wc-seg i:active{transform:scale(.94)}
+.wc-seg i.cool.on{background:#dbe6fb;color:#3e5f9e}.wc-seg i.cool.on.cur{background:#a9c0f0;color:#1f3a73}
+.wc-seg i.warm.on{background:#fbe3d6;color:#a8532a}.wc-seg i.warm.on.cur{background:#f2b593;color:#6e2e0e}
+.wc-seg i.off.on{background:var(--s1);color:var(--t1);box-shadow:0 1px 4px rgba(36,30,72,.1)}
+
+/* bottom-bar seat state: orange when heating, blue when ventilating, hidden when off */
+.dk[data-seatq] .lv{transition:opacity var(--dur-hover) var(--ease)}
+.dk[data-seatq] .lv[data-v="off"]{opacity:0}
+.dk[data-seatq] .lv[data-v="cool"] b{background:#6f9be0}
+.dk[data-seatq] .lv[data-v="warm"] b{background:#e2895c}
+.dk[data-seatq] .lv b.off{background:var(--s3)!important}
+
+/* quick panel above the bottom bar */
+.seatq{position:absolute;bottom:132px;left:50%;margin-left:-40px;width:460px;z-index:40;background:rgba(255,255,255,.86);-webkit-backdrop-filter:blur(20px) saturate(1.4);backdrop-filter:blur(20px) saturate(1.4);border:1px solid rgba(255,255,255,.8);border-radius:28px;padding:18px 20px 20px;box-shadow:0 18px 48px rgba(36,30,72,.18);display:flex;flex-direction:column;gap:16px;
+  opacity:0;transform:translateY(16px) scale(.97);transform-origin:60% 100%;pointer-events:none;transition:opacity var(--dur-panel) var(--ease),transform var(--dur-panel) var(--ease)}
+.seatq.on{opacity:1;transform:none;pointer-events:auto}
+.sq-h{display:flex;justify-content:space-between;align-items:center}
+.sq-x{width:40px;height:40px;border-radius:50%;background:var(--s2);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.sq-x:hover{background:var(--s3)}
+.sq-all{justify-content:space-between}
+
+/* ---------- v78: ET9 top view · Quick controls · Tyres ---------- */
+.qc{flex:1;display:flex;gap:16px;min-height:0;min-width:0}
+.qc-car{flex:1;position:relative;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,var(--s2),#e9e6f1);border-radius:24px;min-width:0;padding:10px 0}
+.ct{height:100%;max-height:620px;width:auto;overflow:visible;display:block}
+.ct-body{fill:#fbfaff;stroke:#bfb8d4;stroke-width:1.6}
+.ct-wh{fill:#3a3647;transition:fill .6s var(--ease)}
+.ct-cav{fill:#d9d4e6}
+.ct-dp{fill:#fbfaff;stroke:#bfb8d4;stroke-width:1.2}
+.ct-seam,.ct-crease,.ct-hood{fill:none;stroke:#d6d1e4;stroke-width:1}
+.ct-hd{fill:#cfc9de}
+.ct-door,.ct-mir,.ct-lid,.ct-port{cursor:pointer}
+.ct-door,.ct-mir{transition:transform var(--dur-panel) var(--ease)}
+.ct-door:hover .ct-dp,.ct-lid:hover path:first-child{fill:#f1eefa}
+.ct-cabin{fill:#f3f1f8;stroke:#d6d1e4}
+.ct-glass{fill:#d5dff4;stroke:#bfcbe8;stroke-width:1}
+.ct-shade{fill:#e4e0ee;stroke:#cfc9de;transform-box:fill-box;transform-origin:50% 100%;transition:transform var(--dur-panel) var(--ease);cursor:pointer}
+.ct-shade.open{transform:scaleY(.1)}
+.ct-spine{fill:#e8e5f0;stroke:#d6d1e4}
+.ct-win{fill:#c3cfee;stroke:transparent;transition:fill var(--dur-panel) var(--ease),opacity var(--dur-panel) var(--ease),stroke var(--dur-panel) var(--ease)}
+.ct-win.vent{opacity:.5}
+.ct-win.open{fill:transparent;stroke:#9fb2ea;stroke-dasharray:3 3}
+.ct-lid path:first-child{fill:#fbfaff;stroke:#bfb8d4;stroke-width:1.2;transition:fill .3s var(--ease)}
+.ct-lid{transform-box:fill-box;transition:transform var(--dur-panel) var(--ease)}
+.ct-frunk{transform-origin:50% 100%}.ct-boot{transform-origin:50% 0}
+.ct-lid.open{transform:scaleY(.38)}
+.ct-hl,.ct-tl{fill:none;stroke:#d6d1e4;stroke-width:4;stroke-linecap:round;transition:stroke .6s var(--ease),filter .6s var(--ease)}
+.ct.l-drl .ct-hl{stroke:#f4ead0}
+.ct.l-on .ct-hl{stroke:#fff3c4;filter:drop-shadow(0 -4px 6px rgba(255,214,120,.9))}
+.ct.l-on .ct-tl,.ct.l-drl .ct-tl{stroke:#e0786f}.ct.l-on .ct-tl{filter:drop-shadow(0 4px 6px rgba(224,96,90,.8))}
+.ct-mir path{fill:#efedf5;stroke:#bfb8d4}
+.ct-pf{fill:#cfc9de;transition:transform var(--dur-panel) var(--ease)}
+.ct-port.open .ct-pf{transform:rotate(-75deg)}
+.ct-pglow{opacity:0;transition:opacity var(--dur-panel) var(--ease)}
+.ct-port.open .ct-pglow{opacity:1;animation:miglow 1.6s var(--ease) infinite alternate}
+.qc-pill{position:absolute;transform:translate(-50%,-50%) scale(.9);padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.88);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 4px 14px rgba(36,30,72,.12);font:500 13px "Red Hat Text";color:var(--t1);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity var(--dur-panel) var(--ease),transform var(--dur-panel) var(--ease)}
+.qc-pill.on{opacity:1;transform:translate(-50%,-50%)}
+.qc-side{width:300px;flex:none;display:flex;flex-direction:column;gap:12px;overflow:auto;scrollbar-width:none}
+.qc-lock{display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:22px;background:var(--ink);color:var(--on-ink);cursor:pointer;transition:background-color var(--dur-hover) var(--ease),transform var(--dur-press) var(--ease)}
+.qc-lock:active{transform:scale(.98)}
+.qc-lock .qc-li .ms{font-size:30px;color:var(--on-ink)}
+.qc-lock b{font:500 18px "Red Hat Text"}.qc-lock .bs{color:rgba(255,255,255,.72);font-size:13px}
+.qc-lock.un{background:var(--s1);color:var(--t1);border:1px solid var(--line)}.qc-lock.un .qc-li .ms{color:var(--t1)}.qc-lock.un .bs{color:var(--t2)}
+.qc-btns{display:flex;gap:8px}.qc-btns .qbtn{height:76px;font-size:13px}
+.qc-card{gap:2px!important;padding:12px 16px}
+.qc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:52px}
+.qc-row+.qc-row{border-top:1px solid var(--s2)}
+.qc-seg{padding:3px!important;border-radius:14px}.qc-seg>div{height:36px!important;padding:0 10px;font-size:13px!important;border-radius:11px}
+.qc-link{cursor:pointer}
+.ty .ct-wh{fill:#8f8ba3}
+.ty .ct-wh.warn{fill:#e5a54a}
+.ty-chip{position:absolute;display:flex;flex-direction:column;gap:0;padding:10px 14px;border-radius:16px;background:var(--s1);border:1px solid var(--line);box-shadow:0 4px 14px rgba(36,30,72,.08);transition:background-color var(--dur-panel) var(--ease),border-color var(--dur-panel) var(--ease)}
+.ty-chip .lbl{font-size:11px;margin:0}.ty-chip b{font:500 24px "Red Hat Display";color:var(--t1)}.ty-chip small{font-size:13px;color:var(--t2)}.ty-chip .bs{font-size:13px}
+.ty-chip.warn{background:#fdf0dc;border-color:#f0c987}.ty-chip.warn b{color:#9a5b0c}
+.ty-dot{width:12px;height:12px;border-radius:50%;background:#7fbf8e;box-shadow:0 0 0 5px rgba(127,191,142,.2);flex:none;transition:background-color .4s var(--ease)}
+.ty-st.warn .ty-dot{background:#e5a54a;box-shadow:0 0 0 5px rgba(229,165,74,.22)}
+
+/* seats: tab bar like Sound */
+.st-wrap>.st-sw{flex:1}
+.st-sw .snd{gap:0;display:block}
+.st-sw .snd-tabs div{font-size:14px}
+
+/* airflow: side view */
+.mi-glass{fill:none;stroke:#c3cdee;stroke-width:3.5;stroke-linecap:round}
+.mi-roof{fill:none;stroke:#e1ddea;stroke-width:1.5}
+.mi-floor{stroke:#e1ddea;stroke-width:1.5}
+.mi-dash{fill:#d6d1e4}
+.mi-wheel{stroke:#a29db8;stroke-width:3;stroke-linecap:round}
+.mi-seat{fill:#dcd8e8;transition:fill .3s var(--ease)}
+.mi-pc{fill:#a29db8;transition:fill .3s var(--ease)}
+.mi-pl{fill:none;stroke:#a29db8;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;transition:stroke .3s var(--ease)}
+.mi-gs{fill:none;stroke:#a9bbef;stroke-width:10;stroke-linecap:round}
+.cl-mode.on .mi-pc{fill:var(--on-sel)}.cl-mode.on .mi-pl{stroke:var(--on-sel)}
+.cl-mode.on .mi-seat{fill:#b9c6ec}.cl-mode.on .mi-dash{fill:#c3cdee}
+.cl-mode.on .mi-gs{stroke:#7f9be6;fill:none}
+.qc-car{overflow:hidden;padding:14px 0}
+.qc-car .ct{height:86%}
+.ty .qc-car .ct{height:66%}
+
+/* ---------- v79: dotted moving airflow · smooth glass · Car › Climate ---------- */
+.mi-glass{fill:none;stroke:#c3cdee;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.mi-air{fill:none;stroke:#9fb2ea;stroke-width:2.6;stroke-linecap:round;stroke-dasharray:.1 4.6;animation:miflow 1.4s linear infinite}
+.mi-ah{fill:none;stroke:#9fb2ea;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;opacity:.8}
+.cl-mode:not(.on) .mi-air{animation-duration:2.6s;opacity:.7}
+.cl-mode.on .mi-air,.cl-mode.on .mi-ah{stroke:#4f6fc8}
+.cl-mode.on .mi-air{animation-duration:.9s}
+@keyframes miflow{to{stroke-dashoffset:-9.4}}
+.cl-mode .mi-ar{display:none}
+.cl-slot{flex:1;display:flex;min-height:0;min-width:0}
+.cl-slot .cl-pane{padding:0;background:transparent;gap:12px;flex:1;border-radius:0}
+.cl-slot .cl-cab{width:220px;padding:14px}
+.cl-slot .cl-cabrow .bs{display:none}
+.cl-slot .cl-top{grid-template-columns:minmax(0,1fr);gap:10px}
+.cl-slot .cl-vsep{display:none}
+.cl-slot .fd{margin:0 auto}
+.cl-slot .cl-qrow .cl-q span{font-size:12px}
+.cl-slot .cl-modes{grid-template-columns:repeat(2,1fr)}
+.cl-slot .cl-vent{flex-direction:column;align-items:stretch}
+.cl-slot .vent-pad{width:100%}
+.cl-slot .cl-aq{flex-wrap:wrap}
+.cl-slot .cl-scents{grid-template-columns:1fr}
+.cl-slot .cl-frrow,.cl-slot .cl-trayrow,.cl-slot .cl-pre{flex-wrap:wrap}
+.cl-slot .snd-tabs div{font-size:12px}
+.cl-slot .snd-tabs{gap:2px}.cl-slot .snd-tabs div{flex:auto;white-space:nowrap;padding:0 8px}
+
+/* ---------- v81: cutaway car · wide pages with mini side strip ---------- */
+.ct-floor{fill:#efecf6;stroke:#d6d1e4;stroke-width:1}
+.ct-dash{fill:#e1ddea}
+.ct-con{fill:#e6e2ef;stroke:#d6d1e4}.ct-con2{fill:#d6d1e4}
+.ct-arm{fill:#e6e2ef}
+.ct-dp{fill:#f7f5fb}
+.ct-seat .tv2-th,.ct-seat .tv2-cu,.ct-seat .tv2-bki{fill:#faf9fd}
+.ct-roof{fill:url(#ctRoof);stroke:#b9c9f0;stroke-width:1;opacity:0;pointer-events:none;transition:opacity var(--dur-panel) var(--ease)}
+.ct-roof.open{opacity:1}
+.ct-win{fill:#c3cfee}
+.ct-shade{display:none}
+
+.ctx{flex:1 1 0;min-width:0;transition:flex var(--dur-panel) var(--ease)}
+.ctx-mini{display:none}
+.frame[data-wide] .ctx{flex:0 0 104px}
+.frame[data-wide] .ctx>:not(.ctx-mini){display:none!important}
+.frame[data-wide] .ctx-mini{display:flex;flex-direction:column;align-items:center;gap:14px;padding:16px 10px;border-radius:var(--r-card);background:var(--s1);border:1px solid var(--line);animation:scrin var(--dur-panel) var(--ease)}
+.cm-art{width:76px;height:76px;border-radius:16px;background:var(--s2) center/cover no-repeat;overflow:hidden;cursor:pointer}
+.cm-art img{width:100%;height:100%;object-fit:cover;display:block}
+.cm-play{width:56px;height:56px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform var(--dur-press) var(--ease)}
+.cm-play .ms{color:var(--on-ink)}.cm-play:active{transform:scale(.94)}
+.cm-sep{width:40px;height:1px;background:var(--line)}
+.cm-bat{display:flex;flex-direction:column;align-items:center;gap:2px}.cm-bat .ms{color:var(--t2)}.cm-bat b{font:500 17px "Red Hat Display";color:var(--t1)}.cm-bat span{font:400 12px "Red Hat Text";color:var(--t3)}
+
+.qc{justify-content:center}
+.qc-side{width:340px}
+.qc-row>.b2{flex:none}
+.qc-seg{flex:none}
+.frame[data-wide] .cl-slot .cl-cab{width:280px}
+.ct-box{position:relative;height:96%;aspect-ratio:300/640;max-width:100%}
+.ct-box .ct,.qc-car .ct-box .ct{width:100%;height:100%;max-height:none}
+.ty .ct-box{height:78%}
+.ct-roof.open{opacity:.55}
+
+/* ---------- v82 ---------- */
+/* Car and Climate pages: no music/battery column */
+.frame[data-wide] .ctx{flex:0 0 0;opacity:0;margin-left:-20px;overflow:hidden;pointer-events:none}
+.ctx{transition:flex var(--dur-panel) var(--ease),opacity var(--dur-hover) var(--ease),margin var(--dur-panel) var(--ease)}
+/* seat side view: soft shadow that follows the seat */
+.sv-floor{fill:#2d2840;opacity:.12;filter:blur(6px);transition:transform .3s var(--ease)}
+/* cutaway: soft shadows, ET9 cabin parts */
+.ct-sh{fill:#2d2840;opacity:.10;filter:blur(5px)}
+.ct-wheel{fill:#8f8ba3}.ct-wheelc{fill:#a29db8}
+.ct-scr{fill:#3a3647;opacity:.75}
+.ct-bulk{fill:none;stroke:#d6d1e4;stroke-width:2;stroke-linecap:round}
+.ct-con{fill:#e6e2ef;stroke:#d6d1e4}.ct-con3{fill:#dcd7e9}
+/* window card */
+.qc-car{position:relative}
+.qc-wcard{position:absolute;left:50%;bottom:14px;width:min(360px,92%);transform:translate(-50%,16px) scale(.97);opacity:0;pointer-events:none;background:rgba(255,255,255,.9);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.8);border-radius:22px;padding:14px 16px;box-shadow:0 14px 40px rgba(36,30,72,.16);display:flex;flex-direction:column;gap:8px;z-index:3;transition:opacity var(--dur-panel) var(--ease),transform var(--dur-panel) var(--ease)}
+.qc-wcard.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.qc-wside{padding:3px!important;border-radius:12px}.qc-wside>div{height:30px!important;padding:0 12px;font-size:13px!important;border-radius:9px}
+.sw-svg{width:100%;display:block}
+.sw-body{fill:#fbfaff;stroke:#bfb8d4;stroke-width:1.4}
+.sw-open{fill:#efecf6}
+.sw-gl{fill:#c3cfee;transition:transform var(--dur-panel) var(--ease)}
+[data-sw]{cursor:pointer}
+.sw-pil{stroke:#bfb8d4;stroke-width:3}.sw-line{stroke:#e1ddea}
+.sw-wh{fill:#3a3647}.sw-hub{fill:#a29db8}.sw-ground{stroke:#e1ddea}
+.sw-read{gap:16px}.sw-read .bs{font-size:13px}
+.ct-win.v{opacity:.5}.ct-win.o{fill:transparent;stroke:#9fb2ea;stroke-dasharray:3 3}
+/* quick controls: menu centred and in proportion with the car */
+.qc{align-items:center;gap:28px}
+.qc-car{flex:0 1 420px;align-self:stretch}
+.qc-side{justify-content:center;align-self:center;max-height:100%}
+/* one touch: full width */
+.st-top .st-pickwrap{width:240px}
+.st-modes{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;align-content:start}
+.st-mode{min-height:96px;padding:16px;border-radius:18px;grid-template-columns:40px 1fr;column-gap:12px}
+.st-mode>.ms{font-size:30px}
+.st-mode b{font-size:17px}.st-mode .bs{font-size:13px}
+/* vents: smooth sweep */
+.vent-pad.sweep .vp-dot{left:calc(50% - 14px);top:calc(50% - 14px);animation:vsweep2 3.4s cubic-bezier(.45,0,.55,1) infinite alternate}
+.vent-pad.sweep .vp-blades i{animation:vblade2 3.4s cubic-bezier(.45,0,.55,1) infinite alternate}
+@keyframes vsweep2{from{transform:translateX(-80px)}to{transform:translateX(80px)}}
+@keyframes vblade2{from{transform:rotate(-14deg)}to{transform:rotate(14deg)}}
+/* driving */
+.dm{overflow:auto;scrollbar-width:none}
+.dm-top{gap:16px;align-items:stretch}
+.dm-dcard{flex:1;position:relative;padding:18px 18px 22px;display:flex;flex-direction:column;align-items:center}
+.dm-dial{width:100%;max-width:380px;display:block;overflow:visible}
+.dm-tr,.dm-v{fill:none;stroke-width:16;stroke-linecap:round}
+.dm-tr{stroke:var(--s2)}
+.dm-v{stroke:var(--mc,#8ea7e6);stroke-dasharray:100;stroke-dashoffset:calc(100 - var(--p,25));transition:stroke-dashoffset var(--dur-panel) var(--ease),stroke var(--dur-panel) var(--ease)}
+.dm-stop{cursor:pointer}.dm-hit{fill:transparent}
+.dm-dot{fill:#fff;opacity:.9}
+.dm-lb{font:500 13px "Red Hat Text";fill:var(--t3);transition:fill .3s var(--ease)}
+.dm-stop.on .dm-lb{fill:var(--t1)}
+.dm-knob{fill:#fff;stroke:var(--mc,#8ea7e6);stroke-width:4;filter:drop-shadow(0 3px 6px rgba(36,30,72,.25));transition:cx var(--dur-panel) var(--ease),cy var(--dur-panel) var(--ease),stroke var(--dur-panel) var(--ease)}
+.dm-c{position:absolute;left:0;right:0;bottom:22px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 70px;text-align:center}
+.dm-n{font:400 34px "Red Hat Display";color:var(--t1)}
+.dm-d{font-size:13px}
+.dm-ccard{flex:1;display:flex;flex-direction:column;gap:8px;padding:18px}
+.dm-car{width:100%;display:block;overflow:visible}
+.dm-road{stroke:#d6d1e4;stroke-width:2}
+.dm-wh circle{fill:#3a3647}.dm-wh .dm-hub{fill:#a29db8}
+.dm-spr path{fill:none;stroke:var(--mc,#8ea7e6);stroke-width:2;stroke-linejoin:round;transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(var(--sy,1));transition:transform var(--dur-panel) var(--ease),stroke var(--dur-panel) var(--ease)}
+.dm-body{transform:translateY(var(--dy,0px));transition:transform var(--dur-panel) var(--ease)}
+.dm-body path:first-child{fill:#fbfaff;stroke:#bfb8d4;stroke-width:1.4;animation:dmbob var(--bs,2.4s) ease-in-out infinite alternate}
+.dm-gl{fill:#d5dff4;animation:dmbob var(--bs,2.4s) ease-in-out infinite alternate}
+@keyframes dmbob{from{transform:translateY(0)}to{transform:translateY(var(--amp,1.6px))}}
+.dm-chips{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.dm-chips>div{background:var(--s2);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.dm-chips .bs{font-size:12px}.dm-chips b{font:500 16px "Red Hat Text";color:var(--t1)}
+.dm-grid{display:grid;grid-template-columns:130px 1fr;gap:10px 16px;align-items:center}
+.dm-seg{padding:3px!important;border-radius:14px}.dm-seg>div{height:38px!important;font-size:14px!important;border-radius:11px}
+.dm-set.locked .dm-seg{pointer-events:none}
+.dm-set.locked .dm-seg>div:not(.on){opacity:.55}
+.dm-save{transition:opacity var(--dur-hover) var(--ease)}
+.sf-cab{fill:#f3f1f8;stroke:#e1ddea}
+.sf-console{fill:#e6e2ef}
+.st-modes{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.st-top>.row{align-items:stretch}
+.st-top .st-modes{flex:1}
+.st-mode{align-content:center}
+
+/* ---------- v83 ---------- */
+/* windows: door panels */
+.sw-door{fill:#fbfaff;stroke:#bfb8d4;stroke-width:1.4}
+.sw-open{fill:#efecf6}
+.sw-belt{stroke:#bfb8d4;stroke-width:2;stroke-linecap:round}
+.sw-hd{fill:#e1ddea}.sw-crease{stroke:#ebe8f2;stroke-width:1.2}
+.sw-gl{fill:#c3cfee;stroke:#a9bbe8;stroke-width:1}
+/* sunshades: glass appears, pleated fabric slides back and forth */
+.ct-roofg{opacity:0;pointer-events:none;transition:opacity var(--dur-panel) var(--ease)}
+.ct-roofg.show{opacity:1}
+.ct-rglass{fill:#cfe0fb;stroke:#a9bbe8;stroke-width:1;opacity:.75}
+.ct-sun{fill:url(#ctSun);opacity:0;transition:opacity 1s var(--ease)}
+.ct-roofg.sun .ct-sun{opacity:1}
+.ct-fab{transform-box:fill-box;transform-origin:50% 100%;transition:transform 1.4s cubic-bezier(.45,0,.2,1);opacity:.96}
+.ct-fab.open{transform:scaleY(.08)}
+.ct-island{fill:#dcd7e9;stroke:#c9c3dc}
+.ct-roof{display:none}
+/* seats: picker fills the height, 2 × 2 one-touch cards */
+.st-top{min-height:440px}
+.st-top>.row{height:100%;gap:16px!important}
+.st-top .st-pickwrap{width:300px;flex:none;display:flex;align-items:center;justify-content:center;padding:8px}
+.st-top .st-pick{height:100%;max-height:520px;width:auto}
+.st-modes{grid-template-columns:1fr 1fr!important;grid-auto-rows:1fr;flex:1}
+.st-mode{min-height:0;height:100%;grid-template-columns:1fr;grid-template-rows:auto auto 1fr;align-content:start;row-gap:6px;padding:18px}
+.st-mode>.ms{grid-row:auto;font-size:32px}
+/* driving: title, wheel in arch, save only in Custom */
+.dm-title{align-self:flex-start;margin-bottom:4px}
+.dm-save{display:none}
+.dm-set:not(.locked) .dm-save{display:inline-flex}
+.dm-set>.row{min-height:40px}
+.dm-car{max-height:230px}
+.dm-tyre{fill:#3a3647}.dm-side{fill:none;stroke:#4d485d;stroke-width:6}
+.dm-rim{fill:#e6e3ee;stroke:#cfc9de;stroke-width:2}
+.dm-spokes path{fill:#c9c3dc}
+.dm-cap{fill:#f3f1f8;stroke:#cfc9de}.dm-capi{fill:#a29db8}
+.dm-cal{fill:none;stroke:var(--mc,#8ea7e6);stroke-width:5;stroke-linecap:round}
+.dm-spin{animation:dmspin 3s linear infinite}
+@keyframes dmspin{to{transform:rotate(360deg)}}
+.dm-panel{fill:#f7f5fb;stroke:none}
+.dm-lip{fill:none;stroke:#bfb8d4;stroke-width:2}
+.dm-body{transform:translateY(var(--dy,0px));transition:transform var(--dur-panel) var(--ease)}
+.dm-body path{animation:none!important}
+.dm-gap{transform:translateY(calc(var(--dy,0px) / 2));transition:transform var(--dur-panel) var(--ease)}
+.dm-gl{stroke:var(--mc,#8ea7e6);stroke-width:2;stroke-dasharray:3 3}
+.dm-gt{font:500 11px "Red Hat Text";fill:var(--t2)}
+.dm-road{stroke:#d6d1e4;stroke-width:2}
+.dm-car{overflow:hidden}.dm-panel{fill:url(#dmPanel)}.dm-sill{stroke:#bfb8d4;stroke-width:2}
+
+/* ---------- v84 ---------- */
+/* doors: red when open, leader line and label */
+.ct-door.open .ct-dp{fill:#fde3df;stroke:#e0605a;filter:drop-shadow(0 0 6px rgba(224,96,90,.75))}
+.ct-dtag{opacity:0;transition:opacity var(--dur-panel) var(--ease);pointer-events:none}
+.ct-dtag.on{opacity:1}
+.ct-lead{stroke:#e0605a;stroke-width:1.4;fill:none}
+.ct-ldot{fill:#e0605a;filter:drop-shadow(0 0 4px rgba(224,96,90,.9))}
+.ct-ltx{font:500 11px "Red Hat Text";fill:#b2403a}
+.ct-lid.red path:first-child{fill:#fde3df;stroke:#e0605a;filter:drop-shadow(0 0 6px rgba(224,96,90,.6))}
+.qc-pill{color:#b2403a;border:1px solid #f3c2bd}
+/* windows: menu card */
+.qc-wcard{width:min(420px,96%);gap:6px}
+.wi-row{display:grid;grid-template-columns:96px 1fr 52px auto;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--s2)}
+.wi-row.wi-all{border-top:none}
+.wi-n{font-size:15px;color:var(--t1)}.wi-all .wi-n{font-weight:500}
+.wi-v{font:500 13px "Red Hat Text";color:var(--t2);text-align:right}
+.wi-bs{display:flex;gap:4px}
+.wi-b{height:34px;padding:0 10px;border-radius:10px;background:var(--s2);display:flex;align-items:center;font:500 13px "Red Hat Text";color:var(--t1);cursor:pointer;transition:background-color var(--dur-hover) var(--ease),transform var(--dur-press) var(--ease)}
+.wi-b:hover{background:var(--s3)}.wi-b:active{transform:scale(.95);background:var(--sel)}
+.wi-sl{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;margin:0;cursor:pointer}
+.wi-sl::-webkit-slider-runnable-track{height:8px;border-radius:4px;background:linear-gradient(90deg,#8ea7e6 var(--p,0%),var(--s2) var(--p,0%))}
+.wi-sl::-moz-range-track{height:8px;border-radius:4px;background:linear-gradient(90deg,#8ea7e6 var(--p,0%),var(--s2) var(--p,0%))}
+.wi-sl::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;margin-top:-7px;border-radius:50%;background:#fff;border:2px solid #8ea7e6;box-shadow:0 2px 6px rgba(36,30,72,.2)}
+.wi-sl::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#fff;border:2px solid #8ea7e6}
+.ct-win{transition:fill-opacity var(--dur-panel) var(--ease)}.ct-win.o{stroke:#9fb2ea;stroke-dasharray:3 3;fill:#c3cfee}
+/* drive mode: lavender knob, colour arc underneath */
+.dm-dial{max-width:400px}
+.dm-tr,.dm-v{fill:none;stroke-width:12;stroke-linecap:round}
+.dm-tr{stroke:var(--s2)}
+.dm-v{stroke:var(--mc);transition:stroke var(--dur-panel) var(--ease)}
+.dm-bez{fill:#eceaf3}
+.dm-cap2{filter:drop-shadow(0 10px 14px rgba(45,40,64,.18))}
+.dm-ring{fill:none;stroke:rgba(255,255,255,.7);stroke-width:1.5}
+.dm-ind{fill:var(--mc);transition:fill var(--dur-panel) var(--ease)}
+.dm-capg{transform-box:view-box;transform-origin:0 0;transition:transform var(--dur-panel) var(--ease);cursor:grab}
+.dm-drag .dm-capg{cursor:grabbing}
+.dm-dot{fill:#fff}
+.dm-c{position:static;padding:0 24px;margin-top:-8px}
+.dm-knob{display:none}
+/* SkyRide polish */
+.dm-liner{fill:#d9d4e6}
+.dm-tread{fill:#3a3647}
+.dm-side{fill:none;stroke:#5b566b;stroke-width:3}
+.dm-rim{stroke:#cfc9de;stroke-width:1.5}
+.dm-rimin{fill:none;stroke:#e9e6f0;stroke-width:2}
+.dm-sp{fill:#bdb6d3}.dm-sp2{fill:#cfc9e2}
+.dm-cap{fill:#f3f1f8;stroke:#cfc9de}.dm-capi{fill:var(--mc,#a29db8)}
+.dm-cal{fill:none;stroke:var(--mc,#8ea7e6);stroke-width:7;stroke-linecap:round;transition:stroke var(--dur-panel) var(--ease)}
+.dm-lip{stroke:#b3abcb;stroke-width:2.5}
+.dm-hl{stroke:#fff;stroke-width:2;opacity:.8}
+.dm-dim{stroke:var(--mc,#8ea7e6);stroke-width:2}
+.dm-tick{stroke:var(--mc,#8ea7e6);stroke-width:2;stroke-linecap:round}
+.dm-gv{font:500 13px "Red Hat Text";fill:var(--t1)}
+.dm-spin{animation:dmspin 2.4s linear infinite}
+.dm-stop.on .dm-lb{opacity:0}.dm-lb{transition:opacity var(--dur-hover) var(--ease),fill .3s var(--ease)}
+
+/* ---------- v85 ---------- */
+.dm-stop.on .dm-lb{opacity:1;fill:var(--t1);font-weight:600}
+.dm-c{margin-top:2px}
+.dm-car{overflow:visible}
+.dm-tyre{fill:#3a3647}.dm-side{fill:none;stroke:#4d485d;stroke-width:2}
+.dm-rim{stroke:#cfc9de;stroke-width:1.2}.dm-rimin{fill:none;stroke:#fff;stroke-width:1.5;opacity:.7}
+.dm-slot{fill:#a9a3c0;opacity:.55}
+.dm-liner{fill:none;stroke:#d6d1e4;stroke-width:12}
+.dm-panel{stroke:none}
+.dm-lip{fill:none;stroke:#b3abcb;stroke-width:2.5}
+.dm-crease{stroke:#fff;stroke-width:2}.dm-sill{stroke:#b3abcb;stroke-width:2}
+.dm-hl,.dm-gap{display:none}
+/* doors under the lock card */
+.qc-lockw{display:flex;flex-direction:column;border-radius:22px;background:var(--s1);border:1px solid var(--line);overflow:hidden}
+.qc-lockw .qc-lock{border-radius:21px;border:none}
+.qc-dchev{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.14);transition:transform var(--dur-panel) var(--ease),background-color var(--dur-hover) var(--ease)}
+.qc-dchev .ms{color:inherit}
+.qc-lock.un .qc-dchev{background:var(--s2)}
+.qc-lockw.exp .qc-dchev{transform:rotate(180deg)}
+.qc-doors{display:grid;grid-template-rows:0fr;transition:grid-template-rows var(--dur-panel) var(--ease)}
+.qc-lockw.exp .qc-doors{grid-template-rows:1fr}
+.qc-dl{overflow:hidden;padding:0 16px}
+.qc-lockw.exp .qc-dl{padding:6px 16px 10px}
+.qc-dr{display:grid;grid-template-columns:1fr auto 72px;align-items:center;gap:10px;min-height:46px;border-top:1px solid var(--s2)}
+.qc-dr:first-child{border-top:none}
+.qc-dr .b2{font-size:15px;color:var(--t1)}.qc-dr .qc-ds{font-size:13px}
+.qc-dr .wi-b{justify-content:center}
+.qc-dr.open .qc-ds{color:#b2403a}.qc-dr.open .wi-b{background:#fde3df;color:#8a2e29}
+.dm-v{stroke-dasharray:none!important;stroke-dashoffset:0!important}
+.dm-ccard{overflow:hidden}
+.dm-body .dm-panel{stroke:none!important;fill:url(#dmPanel)!important}
+.dm-body .dm-liner{fill:none!important;stroke:#d6d1e4!important;stroke-width:12!important}
+
+/* ---------- v86: three columns · ride height control ---------- */
+.qc{gap:20px}
+.qc-left{width:280px;flex:none;align-self:center;display:flex;flex-direction:column;gap:12px}
+.qc-car{flex:1 1 340px}
+.qc-side{width:320px}
+.dm-rh{padding:3px!important;border-radius:14px}.dm-rh>div{height:36px!important;font-size:13px!important;border-radius:11px}
+.dm-body{transition:transform 2s var(--ease)}
+/* v87: close-all button, sunshades fit, columns closer to the car */
+.qc-all{justify-content:center;height:52px}
+.qc{gap:14px}
+.qc-car{flex:0 1 400px}
+.qc-side{width:340px}
+.qc-row{min-width:0}
+.qc-seg{min-width:0;flex:0 1 auto}
+.qc-seg>div{padding:0 9px!important;white-space:nowrap}
+
+/* ---------- v88: one car drawing everywhere ---------- */
+.ct-mirs{fill:#efedf5;stroke:#bfb8d4}
+.st-lbg{fill:rgba(255,255,255,.92);stroke:#e1ddea}
+.st-pick .st-lbl,.cz-svg .st-lbl{font:500 11px "Red Hat Text";fill:var(--t2)}
+.st-seat.on .st-lbg{fill:var(--sel);stroke:#9fb2ea}.st-seat.on .st-lbl{fill:var(--on-sel)}
+.st-pick,.cz-svg{height:100%;width:auto;max-width:100%;display:block;margin:0 auto}
+.st-pickwrap{overflow:hidden}
+.cz-pill rect{fill:rgba(255,255,255,.95)}
+.cz-pill text{font-size:14px}
+
+/* ---------- v89: theme switch ---------- */
+.theme-tg{display:flex;align-items:center;gap:6px;font:500 14px "Red Hat Text";color:#2a2833;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 14px 6px 10px;cursor:pointer;transition:background-color var(--dur-hover) var(--ease)}
+.theme-tg .ms{font-size:20px}
+html,body,.frame,.card,.dock,.pane{transition:background-color var(--dur-panel) var(--ease),color var(--dur-panel) var(--ease),border-color var(--dur-panel) var(--ease)}
+
+/* ---------- v90 ---------- */
+.favb{cursor:pointer;transition:color var(--dur-hover) var(--ease),transform var(--dur-press) var(--ease)}
+.favb.f{color:#e0605a!important;font-variation-settings:"FILL" 1,"wght" 400,"GRAD" 0,"opsz" 24}
+.favb:active{transform:scale(.85)}
+.lrow.now .b2{color:var(--route)!important}
+.lrow[data-song] .ms:last-child{cursor:pointer}
+/* weather: big numbers follow the text colour */
+[data-live="temp"],.wcity .num,.wcity b{color:var(--t1)}
+/* owner's manual */
+details.man{border-top:1px solid var(--s2);padding:12px 0}
+details.man:first-of-type{border-top:none}
+details.man summary{list-style:none;cursor:pointer}details.man summary::-webkit-details-marker{display:none}
+details.man[open] summary .ms:last-child{transform:rotate(180deg)}
+details.man summary .ms:last-child{transition:transform var(--dur-panel) var(--ease)}
+details.man p{margin:10px 0 0 36px;font-size:14px;line-height:1.5}
+/* pet mode */
+.petw{height:100%;display:flex;flex-direction:column}
+.pet-ic{width:96px;height:96px;border-radius:50%;background:var(--route-soft);display:flex;align-items:center;justify-content:center}
+.pet-ic.big{width:150px;height:150px}
+.pet-on{display:none;flex:1;border-radius:var(--r-card);background:var(--s1);flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;animation:scrin var(--dur-panel) var(--ease)}
+.petw.on .pet-off{display:none}.petw.on .pet-on{display:flex}
+.pet-msg{font:400 34px/1.25 "Red Hat Display";color:var(--t1)}
+.pet-t{font:300 64px/1 "Red Hat Display";color:var(--t1)}
+/* calendar: event sheet with delete */
+.calw{position:relative}
+.cal-blk,.cal-li{cursor:pointer}
+.ev-sheet{position:absolute;right:16px;bottom:16px;width:320px;z-index:5;background:var(--s1);border:1px solid var(--line);border-radius:22px;padding:16px 18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px;opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity var(--dur-panel) var(--ease),transform var(--dur-panel) var(--ease)}
+.ev-sheet.on{opacity:1;transform:none;pointer-events:auto}
+.ev-del{margin-top:8px;color:#b2403a!important;justify-content:center}.ev-del .ms{color:#b2403a!important}
+/* chess: bigger board */
+.chess{grid-template-columns:repeat(8,68px);grid-template-rows:repeat(8,68px)}
+.chess i{font-size:46px}
+/* 2048: tiles pop in and merges pulse; tidy arrow pad */
+.b2048 i.pop{animation:t2pop .24s var(--ease)}
+.b2048 i.merge{animation:t2merge .24s var(--ease)}
+@keyframes t2pop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+@keyframes t2merge{50%{transform:scale(1.12)}}
+.g2048 .arrows{display:grid;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(2,56px);gap:6px}
+.g2048 .arrows .key{width:56px;height:56px}
+
+/* ---------- v91 ---------- */
+.newsg{display:grid;grid-template-columns:1fr 1fr;gap:14px;height:100%;overflow:auto;scrollbar-width:none;align-content:start}
+.newsg .lrow{align-items:center}
+.podc{height:100%}
+.podc .lrow{min-height:84px}
+.ph.pod16{background-size:cover;background-position:center}
+.player .art{background-size:cover!important;background-position:center!important}
+
+/* v96: holding a button on a touch screen must not open copy/paste or assistant menus */
+.frame,.frame *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+.frame input,.frame textarea,.frame [contenteditable]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
+.frame img{-webkit-user-drag:none}
+
+/* v97: whole cover, never cropped; the box is filled with a soft blurred copy of the same cover */
+.art.cov,.cart.cov{position:relative;overflow:hidden;background:var(--s2)!important}
+.art-bg,.art-fg{position:absolute;inset:0;background-repeat:no-repeat;background-position:center;font-style:normal;pointer-events:none}
+.art-bg{background-size:cover;filter:blur(18px) saturate(1.2);transform:scale(1.25);opacity:.75}
+.art-fg{background-size:contain;filter:drop-shadow(0 6px 16px rgba(20,16,40,.28))}
+
+.ph.cov.bk{position:relative;overflow:hidden;background:var(--s2)!important;flex:none}
+
+/* ---------- Mark 2: 3D car (et9-3d.js). The drawing shows until the model has loaded, then cross-fades ---------- */
+.c3d-host{position:relative}
+.c3d{position:absolute;inset:0;width:100%!important;height:100%!important;display:block;opacity:0;transition:opacity 600ms cubic-bezier(.2,.8,.2,1);touch-action:none;cursor:grab}
+.c3d:active{cursor:grabbing}
+.c3d-on .c3d{opacity:1}
+.c3d-host>.ct-box,.c3d-host>svg{transition:opacity 600ms cubic-bezier(.2,.8,.2,1)}
+.c3d-on>.ct-box,.c3d-on>svg{opacity:0;pointer-events:none}
+.dm-c3d{position:relative}
+.pt-card{display:flex;flex-direction:column;gap:14px}
+.pt-row{display:flex;gap:14px;flex-wrap:wrap}
+.pt-sw{width:52px;height:52px;border-radius:50%;padding:4px;border:2px solid transparent;transition:border-color 240ms cubic-bezier(.2,.8,.2,1),transform 140ms cubic-bezier(.2,.8,.2,1);cursor:pointer}
+.pt-sw i{display:block;width:100%;height:100%;border-radius:50%;box-shadow:inset 0 -6px 10px rgba(0,0,0,.22),inset 0 4px 8px rgba(255,255,255,.35)}
+.pt-sw:active{transform:scale(.94)}
+.pt-sw.on{border-color:var(--ink)}
+
+/* ---------- Mark 2 · Home: the 3D car in a lavender garden, glass widgets over it ---------- */
+.hm3{position:relative;padding:0!important;overflow:hidden;border-radius:28px;display:block!important}
+.hm-stage{position:absolute;inset:0;z-index:0}
+.hm-stage .c3d{cursor:grab}
+.hm-head{position:absolute;left:28px;right:28px;top:22px;z-index:2;pointer-events:none}
+.hm-head .drv,.hm-head [data-tap]{pointer-events:auto}
+.hm-w{position:relative;z-index:2;background:rgba(255,255,255,.56);-webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3);border:1px solid rgba(255,255,255,.72);border-radius:24px;padding:18px 20px;box-shadow:0 12px 32px rgba(70,50,110,.12);overflow:hidden;transition:background-color 600ms cubic-bezier(.2,.8,.2,1)}
+.hm-next{position:absolute;left:28px;top:120px;width:380px;display:flex;flex-direction:column}
+.hm-next .row[style*="margin:10px 0 18px"]{margin:8px 0 12px!important}
+.hm-next.min .row ~ *{display:none}
+.hm-next.min .row{margin:6px 0 0!important}
+.hm-tg{position:absolute;right:12px;top:12px;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.65);cursor:pointer;z-index:3;transition:transform 140ms cubic-bezier(.2,.8,.2,1),background-color 240ms cubic-bezier(.2,.8,.2,1)}
+.hm-tg:active{transform:scale(.92)}
+.hm-tg .ms{font-size:22px;color:var(--t2)}
+.hm-hint{position:absolute;left:50%;top:30px;transform:translateX(-50%);z-index:2;display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.45);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);pointer-events:none;white-space:nowrap}
+.hm-hint .ms{font-size:20px}
+.hm-dock{position:absolute;left:28px;right:28px;bottom:22px;display:flex;gap:16px;align-items:flex-end;z-index:2}
+.hm-places{width:290px;display:flex;flex-direction:column}
+.hm-places .hrow{transition:background-color 240ms cubic-bezier(.2,.8,.2,1)}
+.hm-places.min{width:auto;flex-direction:row;align-items:center;gap:10px;padding:12px 60px 12px 12px}
+.hm-places.min .lbl{display:none}
+.hm-places.min .hrow{width:56px;height:56px;border-radius:50%;justify-content:center;background:rgba(255,255,255,.75);border:0!important;padding:0!important;gap:0}
+.hm-places.min .hrow>:not(.ms){display:none}
+.hm-bat{display:flex;gap:14px;align-items:center;cursor:pointer;width:190px;padding:16px 18px}
+.hm-bat .icb{background:rgba(255,255,255,.7)}
+.hm-pod{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+.hm-pod .ph{flex:none!important;height:74px;min-height:0!important}
+.hm-pod.min{flex:0 0 auto;padding:12px 60px 12px 12px}
+.hm-pod.min .lbl,.hm-pod.min .b2,.hm-pod.min .sl{display:none}
+.hm-pod.min .pod{flex:0 0 96px!important}
+.hm-pod.min .ph{height:54px}
+.hm-music{width:380px;padding:0}
+.hm-music .player{height:112px!important;width:100%;flex:none!important;background:transparent!important;box-shadow:none!important;border:0!important}
+.hm-music.min{width:118px}
+.hm-music.min .pc-txt,.hm-music.min [data-next]{display:none}
+.hm-music .hm-tg{top:38px}
+.hm-music.min .hm-tg{display:none}
+.hm-music.min .p-compact .cart{cursor:pointer}
+html[data-theme="dark"] .hm-w,html[data-theme="dark"] .hm-hint{background:rgba(36,28,48,.55);border-color:rgba(255,255,255,.08);box-shadow:0 12px 32px rgba(0,0,0,.35)}
+html[data-theme="dark"] .hm-tg,html[data-theme="dark"] .hm-places.min .hrow,html[data-theme="dark"] .hm-bat .icb{background:rgba(255,255,255,.1)}
+
+/* ---------- Mark 2 · lock screen ---------- */
+.lockov{position:absolute;inset:0;z-index:80;border-radius:inherit;overflow:hidden;display:none;background:#ece4f3;transition:transform 600ms cubic-bezier(.2,.8,.2,1),opacity 600ms cubic-bezier(.2,.8,.2,1);touch-action:none;cursor:pointer}
+.lockov.on{display:block}
+.lockov.out{transform:translateY(-100%)!important;opacity:.4}
+.lk-stage{position:absolute;inset:0}
+.lk-stage .c3d{cursor:pointer;touch-action:none}
+.lk-top{position:absolute;left:0;right:0;top:54px;display:flex;flex-direction:column;align-items:center;gap:2px;pointer-events:none;z-index:2}
+.lk-time{font:300 128px/1 "Red Hat Display";color:#2a2340;letter-spacing:-3px}
+.lk-date{font:400 22px "Red Hat Text";color:#4a4160}
+.lk-info{position:absolute;left:50%;bottom:86px;transform:translateX(-50%);display:flex;gap:14px;align-items:center;padding:14px 26px;border-radius:999px;background:rgba(255,255,255,.55);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);z-index:2;pointer-events:none;white-space:nowrap}
+.lk-info .b2{color:#2a2340}
+.lk-info i{width:4px;height:4px;border-radius:50%;background:#8a80a6}
+.lk-hint{position:absolute;left:0;right:0;bottom:22px;display:flex;flex-direction:column;align-items:center;color:#4a4160;font:400 15px "Red Hat Text";z-index:2;pointer-events:none;animation:lkb 2.4s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes lkb{0%,100%{transform:translateY(0);opacity:.75}50%{transform:translateY(-6px);opacity:1}}
+html[data-theme="dark"] .lockov{background:#1e1828}
+html[data-theme="dark"] .lk-time,html[data-theme="dark"] .lk-info .b2{color:#f3eefb}
+html[data-theme="dark"] .lk-date,html[data-theme="dark"] .lk-hint{color:#c9bfdc}
+html[data-theme="dark"] .lk-info{background:rgba(36,28,48,.55)}
+
+/* ---------- Mark 2 · Tyres: chips sit beside their wheel ---------- */
+.ty .qc-car.c3d-host{flex:0 0 560px}
+.ty .ty-chip{transition:top 600ms cubic-bezier(.2,.8,.2,1),left 600ms cubic-bezier(.2,.8,.2,1),opacity 600ms cubic-bezier(.2,.8,.2,1),background-color 600ms cubic-bezier(.2,.8,.2,1),border-color 600ms cubic-bezier(.2,.8,.2,1);z-index:2}
+.ty .qc-car.c3d-host:not(.ty-laid) .ty-chip{opacity:0}
+.hm-music .player .p-full{opacity:0!important;pointer-events:none!important}
+.hm-music .player .p-compact{opacity:1!important;pointer-events:auto!important}
+
+/* ---------- Mark 2 · Quick controls: door buttons beside the 3D car, floating hint ---------- */
+.qc-dico{position:absolute;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--s1);border:1px solid var(--line);box-shadow:0 6px 16px rgba(36,30,72,.1);z-index:3;cursor:pointer;transition:background-color 240ms cubic-bezier(.2,.8,.2,1),border-color 240ms cubic-bezier(.2,.8,.2,1),transform 140ms cubic-bezier(.2,.8,.2,1),opacity 600ms cubic-bezier(.2,.8,.2,1),top 600ms cubic-bezier(.2,.8,.2,1),left 600ms cubic-bezier(.2,.8,.2,1)}
+.qc-dico .ms{font-size:24px;color:var(--t2)}
+.qc-dico:active{transform:scale(.92)}
+.qc-dico.open{background:#fdebee;border-color:#efb3bc}
+.qc-dico.open .ms{color:#c23a48}
+.qc-car:not(.qc-laid) .qc-dico{opacity:0;pointer-events:none}
+.qc-car:not(.c3d-on) .qc-hint{opacity:0}
+.qc-hint{position:absolute;left:50%;top:14px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:999px;background:var(--s1);border:1px solid var(--line);box-shadow:0 6px 16px rgba(36,30,72,.08);font:400 15px "Red Hat Text";color:var(--t2);white-space:nowrap;z-index:3;pointer-events:none;transition:opacity 600ms cubic-bezier(.2,.8,.2,1)}
+.qc-hint .ms{font-size:20px}
+html[data-theme="dark"] .qc-dico.open{background:#4a2430;border-color:#7a3a4a}
+html[data-theme="dark"] .qc-dico.open .ms{color:#ff9aa8}
+
+/* ---------- Mark 2 · Home widgets: one height for the bottom row, Places as wide as Next ---------- */
+.hm-next>.hm-tg{display:none}
+.hm-next{width:380px}
+.hm-dock{align-items:flex-end}
+.hm-dock>.hm-w{height:176px;box-sizing:border-box}
+.hm-dock>.hm-w.min{height:88px}
+.hm-tg{top:10px;right:10px;width:32px;height:32px}
+.hm-places{width:380px;padding:16px 20px}
+.hm-places .hrow{height:40px;min-height:0;padding:0!important}
+.hm-places.min{width:auto}
+.hm-bat{width:176px;flex-direction:column;align-items:flex-start;justify-content:space-between;padding:18px 20px}
+.hm-bat .b1{font-size:30px}
+.hm-pod{padding:16px 20px;gap:8px}
+.hm-pod .ph{height:86px}
+.hm-pod.min{padding:12px 56px 12px 12px}
+.hm-pod.min .ph{height:62px}
+.hm-music{width:420px}
+.hm-music .player .p-compact{top:50%;transform:translateY(-50%);height:96px}
+.hm-music .player .p-compact .cart{width:96px!important;height:96px!important;border-radius:16px!important}
+.hm-music .hm-tg{top:10px}
+.hm-music.min{width:136px}
+.hm-music.min .player .p-compact{height:64px}
+.hm-music.min .player .p-compact .cart{width:64px!important;height:64px!important}
+.hm-music.min .play{display:none}
+
+/* ---------- Mark 2 · toasts: light frosted glass by day, centred on the content; hazard button ---------- */
+html:not([data-theme="dark"]) .htoast{background:rgba(255,255,255,.9);color:var(--t1);border:1px solid var(--line);-webkit-backdrop-filter:blur(16px) saturate(1.3);backdrop-filter:blur(16px) saturate(1.3);box-shadow:0 12px 32px rgba(40,30,80,.16);font-weight:500}
+.htoast{white-space:nowrap}
+.qc-btns{gap:10px}
+.qc-btns .qbtn{min-width:0}
+.qbtn.hz.on{background:#ffb02e;border-color:#ffb02e;color:#3a2400;animation:hzp 1.33s steps(1) infinite}
+.qbtn.hz.on .ms{color:#3a2400}
+@keyframes hzp{50%{background:#ffd27a;border-color:#ffd27a}}
+/* ---------- Mark 2 · Home music widget: everything on one centred line, clear of the fold button ---------- */
+.hm-music .player{height:100%!important}
+.hm-music .player .p-compact{left:20px;right:56px;top:50%;transform:translateY(-50%);height:96px;gap:16px}
+.hm-music .player .p-compact .pc-txt{min-width:0}
+.hm-music .player .p-compact .pc-txt .h3,.hm-music .player .p-compact .pc-txt .b2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hm-music .player .p-compact .play{flex:none}
+.hm-music .player .p-compact [data-next]{flex:none;width:44px!important}
+.hm-music.min .player .p-compact{left:12px;right:12px}
+.hm-music .hm-mslot{position:absolute;inset:0}
+.qc-btns{display:grid!important;grid-template-columns:1fr 1fr;gap:10px}
+.qc-btns .qbtn{height:64px;flex-direction:row;gap:10px}
+.qc-btns .qbtn .ms{font-size:24px}
+
+/* ---------- Mark 2 · Home widgets, round 3: Next sits right above Places; Battery card; every widget folds the same way ---------- */
+.hm-next{top:auto!important;bottom:214px}
+.hm-bat{width:176px;padding:16px 18px!important;display:block!important}
+.hb-full{height:100%;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer}
+.hb-top{display:flex;align-items:center;gap:6px;height:24px}
+.hb-top .ms{font-size:20px;color:#3f9b62}
+.hb-big{font:400 44px/1 "Red Hat Display";color:var(--t1);letter-spacing:-1px}
+.hb-big small{font-size:20px;margin-left:2px;color:var(--t2)}
+.hb-bar{height:6px;border-radius:3px;background:rgba(36,30,72,.1);overflow:hidden}
+.hb-bar i{display:block;height:100%;width:78%;border-radius:3px;background:#3f9b62}
+.hb-mini{display:none;width:56px;height:56px;position:relative;place-items:center;cursor:pointer}
+.hb-mini svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.hb-tr{fill:none;stroke:rgba(36,30,72,.12);stroke-width:5}
+.hb-v{fill:none;stroke:#3f9b62;stroke-width:5;stroke-linecap:round;stroke-dasharray:78 100}
+.hb-mini b{position:relative;font:500 17px "Red Hat Text";color:var(--t1)}
+.hm-bat.min{width:auto}
+.hm-bat.min .hb-full{display:none}
+.hm-bat.min .hb-mini{display:grid}
+.hm-dock>.hm-w.min{height:88px;padding:12px 58px 12px 14px!important;display:flex!important;flex-direction:row;align-items:center;gap:10px}
+.hm-w.min>.hm-tg{top:50%;transform:translateY(-50%);display:grid!important}
+.hm-w.min>.hm-tg:active{transform:translateY(-50%) scale(.92)}
+.hm-music.min{width:206px}
+.hm-music.min .player .p-compact{left:12px;right:58px}
+.hm-music.min .play{display:flex!important}
+html[data-theme="dark"] .hb-bar,html[data-theme="dark"] .hb-tr{background:rgba(255,255,255,.12);stroke:rgba(255,255,255,.14)}
+
+/* ---------- Mark 2 · Quick controls: Windows menu sits over the right column, the car turns to show the glass ---------- */
+.qc-wcard{left:calc(100% + 18px)!important;right:auto;top:0;bottom:auto!important;width:340px!important;transform:translateX(14px) scale(.98)!important}
+.qc-wcard.on{transform:none!important}
+.qc.wv .qc-dico,.qc.wv .qc-hint{opacity:0!important;pointer-events:none!important}
+.qc-car{overflow:visible}
+
+/* ---------- Mark 2 · Driving: the scene has rounded corners ---------- */
+.dm-c3d.c3d-host{border-radius:16px;overflow:hidden}
+.dm-c3d .c3d{border-radius:16px}
+
+/* ---------- Mark 2 · Now playing sheet ---------- */
+.pk-now{display:flex;align-items:center;gap:14px;padding:14px;border-radius:18px;background:var(--s2)}
+.pk-big{width:72px;height:72px;border-radius:14px;flex:none;background:var(--s3) center/cover;display:grid;place-items:center}
+.pk-big .ms{font-size:32px;color:var(--t2)}
+.pk-t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pk-pp{width:52px;height:52px;background:var(--ink)!important;flex:none}
+.pk-pp .ms{color:var(--on-ink);font-size:28px}
+.pk-tabs{padding:4px}
+.pk-tabs div{height:40px;font-size:15px}
+.pk-radio{display:grid;place-items:center}
+.pk-radio .ms{font-size:22px;color:var(--t2)}
+.pk-list{flex:1;overflow:auto}
+/* ---------- Mark 2 · vent pad, second style: air flow ---------- */
+.vp-style{padding:3px}
+.vp-style div{height:32px;font-size:14px;padding:0 12px}
+.vp-flow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0;transition:opacity 600ms cubic-bezier(.2,.8,.2,1)}
+.vent-pad.flow .vp-flow{opacity:1}
+.vent-pad .vp-grid,.vent-pad .vp-blades,.vent-pad .vp-dot{transition:opacity 600ms cubic-bezier(.2,.8,.2,1)}
+.vent-pad.flow .vp-blades{opacity:.18}
+.vent-pad.flow .vp-dot{opacity:0}
+.vent-pad.flow .vp-grid{opacity:.25}
+
+/* ---------- Mark 2 · Windows: opens in place in the right column, like the lock card and the Home widgets ---------- */
+.qc-side{overflow:auto;scrollbar-width:none}
+.qc-wsec .qc-wchev{display:grid;transition:transform 600ms cubic-bezier(.2,.8,.2,1)}
+.qc-wsec.on .qc-wchev{transform:rotate(180deg)}
+.qc-wbody{display:grid;grid-template-rows:0fr;transition:grid-template-rows 600ms cubic-bezier(.2,.8,.2,1)}
+.qc-wsec.on .qc-wbody{grid-template-rows:1fr}
+.qc-wl{min-height:0;overflow:hidden}
+.qc-wsec.on .qc-wl{padding:2px 0 10px}
+.qc-wl .wi-row{display:grid;grid-template-columns:1fr auto;align-items:center;row-gap:2px;padding:8px 0;border-top:1px solid var(--line)}
+.qc-wl .wi-row .wi-n{color:var(--t1)}
+.qc-wl .wi-row .wi-v{font:400 15px "Red Hat Text";color:var(--t2);text-align:right}
+.qc-wl .wi-row .wi-sl{grid-column:1/-1;height:26px}
+.qc-wl .wi-seg{grid-column:1/-1;margin-top:6px;padding:3px}
+.qc-wl .wi-seg div{height:36px;font-size:15px}
+/* ---------- Mark 2 · Podcasts widget: folds like Music (one cover + play); fold button lines up with the label ---------- */
+.hm-pod{padding-top:14px!important}
+.hm-pod>.lbl{height:24px;display:flex;align-items:center;padding-right:44px}
+.hm-pod:not(.min)>.hm-tg{top:10px}
+.hm-podplay{display:none!important;width:56px!important;height:56px!important;flex:none}
+.hm-pod.min .hm-podplay{display:flex!important}
+.hm-pod.min>.row{flex:0 0 auto!important}
+.hm-pod.min .pod{flex:0 0 64px!important}
+.hm-pod.min .pod:not(:first-child){display:none!important}
+.hm-pod.min .pod .ph{width:64px;height:64px!important;flex:none!important;border-radius:12px}
+.hm-pod.min .pod .ell,.hm-pod.min .pod .sl{display:none}
+/* ---------- Mark 2 · lock screen: wait until everything is ready, then "Tap to unlock" ---------- */
+.lk-hint{gap:6px}
+.lk-go{display:none}
+.lockov.ready .lk-go{display:block}
+.lockov.ready .lk-wait,.lockov.ready .lk-bar{display:none}
+.lockov:not(.ready){cursor:progress}
+.lockov:not(.ready) .lk-hint>.ms{display:none}
+.lockov:not(.ready) .lk-hint{animation:none}
+.lk-bar{display:block;width:120px;height:3px;border-radius:2px;background:rgba(74,65,96,.18);overflow:hidden;position:relative}
+.lk-bar::after{content:"";position:absolute;inset:0;width:40%;border-radius:2px;background:#7a6bf2;animation:lkload 1.2s cubic-bezier(.45,0,.55,1) infinite}
+@keyframes lkload{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}
+
+/* ---------- Mark 2 · Quick controls, new layout: the car on the left, every control on the right ---------- */
+.qc.qc2{gap:24px;align-items:stretch}
+.qc2 .qc-car{flex:1 1 auto!important;align-self:stretch}
+.qc2 .qc-side{width:380px;align-self:stretch;justify-content:flex-start;max-height:100%}
+.qc2 .qc-left{display:grid;grid-template-columns:1fr 132px;gap:10px;width:auto;flex:none}
+.qc2 .qc-doors,.qc2 .qc-dchev{display:none!important}
+.qc2 .qc-lockw{border:0;background:transparent;border-radius:22px}
+.qc2 .qc-lock{height:100%;box-sizing:border-box}
+.qc2 .qc-all{flex-direction:column;justify-content:center;gap:4px;height:auto;min-height:76px;padding:10px 12px;border-radius:22px;text-align:center;font-size:14px;line-height:1.2;white-space:normal}
+.qc2 .qc-all .ms{font-size:24px}
+/* Podcasts widget open: the covers stop before the fold button's column */
+.hm-pod:not(.min){padding-right:56px!important}
+.hm-pod:not(.min)>.hm-tg{right:12px}
+/* Driving: a soft cinematic vignette over the scene */
+.dm-c3d.c3d-host::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:16px;background:radial-gradient(ellipse 75% 70% at 50% 46%,rgba(0,0,0,0) 62%,rgba(40,28,64,.16) 100%)}
+/* rear executive table: turns towards either seat */
+.tray-out .tr-tab{transform:rotate(var(--aim,0deg))}
+.tr-aimrow{transition:opacity 240ms cubic-bezier(.2,.8,.2,1)}
+.tr-aimrow.dim{opacity:.55}
+/* Quick controls: the lock card and Close all and lock share the same two-column grid, widths and corners as the buttons below */
+.qc2 .qc-left{grid-template-columns:1fr 1fr!important;gap:10px!important}
+.qc2 .qc-lockw,.qc2 .qc-lock,.qc2 .qc-all{border-radius:18px!important}
+.qc2 .qc-lock,.qc2 .qc-all{min-height:72px;height:72px!important;min-width:0}
+.qc2 .qc-lock{padding:0 14px;gap:10px}
+.qc2 .qc-all{flex-direction:row!important;gap:8px!important;padding:0 12px!important;font-size:14px}
+/* Car › Charging: the 3D car with live charging, and the battery beside it */
+.chg-page{overflow:auto;scrollbar-width:none;gap:16px}
+.chg-top{gap:16px;align-items:stretch;flex:none}
+.chg-hero{flex:1.5;position:relative;min-height:300px;padding:0;overflow:hidden;background:linear-gradient(180deg,var(--s1),var(--s2))}
+.chg-car{position:absolute;inset:0}
+.chg-tag{position:absolute;left:16px;bottom:14px;display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.7);backdrop-filter:blur(12px);color:var(--t2);transition:color 240ms cubic-bezier(.2,.8,.2,1)}
+.chg-tag .ms{font-size:18px}
+.chg-page.on .chg-tag{color:#1e9e5a}
+.chg-side{flex:1;display:flex;flex-direction:column;gap:12px;min-width:0}
+.chg-pct{font:500 56px/1 "Red Hat Display",sans-serif;color:var(--t1);letter-spacing:-.02em}
+.chg-pct small{font-size:24px;margin-left:2px;color:var(--t2)}
+.chg-bar{position:relative;height:12px;border-radius:6px;background:var(--s2);overflow:hidden}
+.chg-fill{position:absolute;left:0;top:0;bottom:0;width:var(--p,78%);border-radius:6px;background:linear-gradient(90deg,#3fbf7f,#58d394);transition:width 600ms cubic-bezier(.2,.8,.2,1)}
+.chg-page.on .chg-fill{background:linear-gradient(90deg,#3fbf7f 0%,#7ae6ad 40%,#3fbf7f 80%);background-size:200% 100%;animation:chgShine 2.4s linear infinite}
+@keyframes chgShine{from{background-position:200% 0}to{background-position:0 0}}
+.chg-lim{position:absolute;top:-2px;bottom:-2px;left:var(--l,90%);width:2px;background:var(--t2);opacity:.55}
+.chg-stat{min-height:40px}
+.chg-go{margin-top:auto;height:56px;border-radius:16px;gap:8px;transition:background 240ms cubic-bezier(.2,.8,.2,1),transform 140ms cubic-bezier(.2,.8,.2,1)}
+.chg-go:active{transform:scale(.97)}
+.chg-page.on .chg-go{background:var(--s2);color:var(--t1)}
+.hm-bat .hb-bar i{width:var(--bp,78%);transition:width 600ms cubic-bezier(.2,.8,.2,1)}
+.hm-bat.chg .hb-bar i{background:linear-gradient(90deg,#3f9b62 0%,#7ae6ad 45%,#3f9b62 90%);background-size:200% 100%;animation:chgShine 2.4s linear infinite}
+.chg-page.on .chg-go .ms{color:var(--t1)}
+/* Home: only the current driver's photo */
+.hm-head [data-drv]:not(.on){display:none}
+/* Quick controls: fixed, equal columns that never shift when a tile turns on */
+.qc2 .qc-side{width:380px!important;flex:none!important}
+.qc2 .qc-left,.qc2 .qc-btns{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;width:100%!important}
+.qc2 .qc-lockw,.qc2 .qc-all,.qc2 .qc-btns .qbtn{width:100%!important;min-width:0!important;box-sizing:border-box!important;margin:0!important;border-width:1px!important}
+.qc2 .qc-lock{width:100%;justify-content:center!important;align-items:center!important;text-align:left}
+.qc2 .qc-btns .qbtn,.qc2 .qc-all,.qc2 .qc-lock{font-weight:500!important;white-space:nowrap}
+/* vents: sweep shown as vertical vanes turning left and right, the way the air actually moves */
+.vent-pad.sweep .vp-blades{flex-direction:row;inset:26px 40px;perspective:260px}
+.vent-pad.sweep .vp-blades i{width:6px;height:auto;animation:vvane 3.4s cubic-bezier(.45,0,.55,1) infinite alternate}
+@keyframes vvane{from{transform:rotateY(-58deg)}to{transform:rotateY(58deg)}}
+/* rear table, seen from above: turns towards the seat it serves, and that seat lights up */
+.tray-svg{width:140px!important;height:90px!important}
+.tr-tab{transform-origin:70px 46px!important;transform:scale(.4)!important;opacity:.5;transition:transform .6s var(--ease),opacity .6s var(--ease)}
+.tray-out .tr-tab{transform:translateX(var(--tx,0px)) rotate(var(--aim,0deg))!important;opacity:1}
+.tr-tab rect{fill:#7a6fd0!important}.tr-dir{stroke:#7a6fd0;stroke-width:2;stroke-linecap:round;opacity:0}
+.tr-seat{transition:fill .4s var(--ease)}.tray-out.aim-l .tr-sl,.tray-out.aim-r .tr-sr{fill:#d9d2fa}
+.tr-l{font:600 9px "Red Hat Text",sans-serif;fill:var(--t3);text-anchor:middle}
+/* Home: no driver photos */
+.hm-head [data-drv]{display:none!important}
+/* Quick controls: a single lock button across the full width */
+.qc2 .qc-lockw{display:none!important}
+.qc2 .qc-all{grid-column:1 / -1;height:64px!important;min-height:64px}
+.qc2 .qc-all.locked{background:var(--s1)!important;color:var(--t1)!important;border:1px solid var(--line)!important}
+.qc2 .qc-all.locked .ms{color:var(--t1)!important}
+html[data-theme="dark"] .qc-btns .qbtn.hz.on,html[data-theme="dark"] .qc-btns .qbtn.hz.on .ms{color:#2a2410!important}
+/* camera feeds: stills rendered from cameras on the 3D car, with a slow drift so they read as live */
+.camv{position:relative;border-radius:14px;overflow:hidden;background:#1c1b22 center/cover no-repeat;animation:camDrift 9s ease-in-out infinite alternate}
+.camv::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,rgba(0,0,0,0) 55%,rgba(10,8,20,.42) 100%)}
+@keyframes camDrift{from{background-size:104%;background-position:48% 50%}to{background-size:108%;background-position:52% 48%}}
+.camtag{position:absolute;left:12px;top:10px;z-index:1;font:600 13px "Red Hat Text",sans-serif;color:#fff;padding:3px 10px;border-radius:999px;background:rgba(20,18,30,.45);backdrop-filter:blur(8px)}
+.camlive{position:absolute;right:12px;top:10px;z-index:1;font:700 11px "Red Hat Text",sans-serif;color:#fff;padding:3px 8px;border-radius:999px;background:#e0394b;letter-spacing:.06em}
+/* camera feeds always fill their box (cover), drifting with a gentle zoom instead of resizing the image */
+.camv{background-size:cover!important;background-position:center!important;animation:none!important}
+.camv::before{content:"";position:absolute;inset:0;background:inherit;background-size:cover;background-position:center;animation:camDrift2 9s ease-in-out infinite alternate}
+@keyframes camDrift2{from{transform:scale(1.03) translateX(-.6%)}to{transform:scale(1.07) translateX(.6%)}}
+.camtint{position:absolute;inset:0;pointer-events:none;background:var(--paint,#1d2540);mix-blend-mode:multiply;opacity:.88;-webkit-mask-size:cover;mask-size:cover;-webkit-mask-position:center;mask-position:center;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;animation:camDrift2 9s ease-in-out infinite alternate}
+.camtag,.camlive,.camv .warnbar{z-index:2}
+/* embedded in the project page (prototype.html?embed=1): just the screen */
+html.embed,html.embed body{background:transparent!important}
+html.embed body{padding:0;min-height:0;display:block}
+html.embed .sitebar,html.embed .disc{display:none!important}
+html.embed .wrap{width:100%}
+html.embed .scaler{box-shadow:none}
+
+/* dock dividers stay visible when the dashboard is scaled down */
+.dock .sep{width:2px;border-radius:1px;background:var(--t3);opacity:.45}
+
+/* parking: six-step progress, booking pane beside the steps, filters, arrival */
+.pflow{display:flex;flex-direction:column;gap:14px}
+.pstep{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.pstep>div{display:flex;flex-direction:column;gap:6px;font:500 13px 'Red Hat Text';color:var(--t3)}
+.pstep i{height:6px;border-radius:3px;background:var(--s3);transition:background var(--dur-hover) var(--ease)}
+.pstep .done i{background:var(--route);opacity:.4}.pstep .done{color:var(--t2)}
+.pstep .on i{background:var(--route)}.pstep .on{color:var(--t1);font-weight:600}
+.pbody{flex:1;display:flex;gap:16px;min-height:0}
+.pmain{flex:1.5;min-width:0}
+.pside{flex:1;min-width:0;display:flex;flex-direction:column;gap:14px;align-self:flex-start}
+.pside-st{padding:10px 14px;border-radius:12px;background:var(--s2)}
+.pside-st.ok{background:#dff3e7;color:#1d6b42}
+.pfil{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.pfil>div{height:40px;padding:0 16px;display:flex;align-items:center;border-radius:20px;background:var(--s2);color:var(--t2);font:500 15px 'Red Hat Text';cursor:pointer;transition:background var(--dur-hover) var(--ease),color var(--dur-hover) var(--ease)}
+.pfil>div:active{transform:scale(.97);transition-duration:var(--dur-press)}
+.pfil>div.on{background:var(--sel);color:var(--on-sel)}
+.pbig{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pbig>div{display:flex;flex-direction:column;gap:4px;padding:18px 22px;border-radius:18px;background:var(--s2)}
+.pbig b{font:600 72px/1 'Red Hat Display';color:var(--t1)}
+.phint{padding:14px 16px;border-radius:14px;background:var(--route-soft)}
+.pbody .pst .kv>div{padding-top:9px;padding-bottom:9px}
+.pmap{height:230px;border-radius:14px;overflow:hidden;margin-bottom:12px;background:var(--map-land)}
+.pmap svg{width:100%;height:100%;display:block}
+.ppin{cursor:pointer}
+.ppin rect{fill:var(--s1);stroke:var(--route);stroke-width:2.5;transition:transform var(--dur-press) var(--ease)}
+.ppin:active rect{transform:scale(.92)}
+.ppin .pp-p{font:700 16px 'Red Hat Display';fill:var(--route)}
+.ppin.rec rect{fill:var(--route)}.ppin.rec .pp-p{fill:#fff}
+.ppin .pp-n{font:600 13px 'Red Hat Text';fill:var(--t1);paint-order:stroke;stroke:var(--map-land);stroke-width:4px}
+.ppin .pp-s{font:500 11px 'Red Hat Text';fill:var(--t2);paint-order:stroke;stroke:var(--map-land);stroke-width:4px}
+.pmud circle{fill:var(--ink);stroke:#fff;stroke-width:3}
+.pmud text{font:600 13px 'Red Hat Text';fill:var(--t1);paint-order:stroke;stroke:var(--map-land);stroke-width:4px}
+.frame[data-wide] .callov{width:auto;right:24px}   /* full-width pages: the call screen covers the whole page */

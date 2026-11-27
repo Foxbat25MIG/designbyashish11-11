@@ -151,12 +151,12 @@
     },
     {
       "slug": "nio",
-      "title": "Nio",
+      "title": "NIO ET9 Centre Screen",
       "card_label": "Nio",
-      "year": "2026",
-      "cover": "/media/nio/cover.jpg",
+      "year": "2025",
+      "cover": "/media/nio/home/nio-1440.jpg",
       "logo": "/media/nio/logo.png",
-      "overview": "Design a modular, intelligent center console UI for NIO vehicles, focused on clarity, comfort, and seamless interaction across driving, navigation, media, and lifestyle use cases.",
+      "overview": "A modular, intelligent centre console for the NIO ET9, focused on clarity, comfort and seamless interaction across driving, navigation, media and lifestyle, built as a live, clickable prototype with a real-time 3D car.",
       "top_images": [
         "/media/nio/image-1.jpg"
       ],
@@ -179,7 +179,9 @@
           "src": "/media/nio/video-3.mp4",
           "caption": ""
         }
-      ]
+      ],
+      "cover_srcset": "/media/nio/home/nio-480.webp 480w, /media/nio/home/nio-768.webp 768w, /media/nio/home/nio-1080.webp 1080w, /media/nio/home/nio-1440.webp 1440w, /media/nio/home/nio-1920.webp 1920w, /media/nio/home/nio-2560.webp 2560w",
+      "custom_page": "custom-pages/nio.html"
     },
     {
       "slug": "steam",

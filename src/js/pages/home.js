@@ -77,7 +77,13 @@ export function renderHome(site, data) {
     const a = document.createElement("a");
     a.className = "card";
     a.href = url(p.slug + "/");
-    placeMedia(a, p.cover, "image", p.title);
+    const box = placeMedia(a, p.cover, "image", p.title);
+    // Optional "cover_srcset" in projects.json: phones and tablets download a smaller cover, big screens a sharper one
+    const im = p.cover_srcset && box.querySelector("img");
+    if (im) {
+      im.srcset = p.cover_srcset.split(",").map((s) => { const [f, w] = s.trim().split(/\s+/); return url(f) + " " + w; }).join(", ");
+      im.sizes = "(max-width: 760px) 100vw, 50vw";
+    }
     const meta = document.createElement("div");
     meta.className = "meta";
     meta.innerHTML = "<span>" + esc(p.card_label || p.title) + "</span><span>" + esc(p.year) + "</span>";
