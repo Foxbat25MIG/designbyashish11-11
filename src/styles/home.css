@@ -38,6 +38,8 @@ body.home{
 .home .exp-cols{font-size:var(--small);column-gap:var(--gap)}
 .home .exp-cols small{font-size:calc(var(--small)*.8);margin-bottom:1.1em}
 .home .exp-cols p{line-height:1.2}
+/* the two experiences start on the same line as the intro paragraph ("Based in Turin…") */
+@media (min-width:761px){.home .exp{grid-template-columns:1fr 1fr}.home .exp-cols{grid-column:2}}
 
 /* footer: wide artwork, then contact row on the same 3 columns */
 .home .foot{padding:0 var(--pad) var(--pad)}
